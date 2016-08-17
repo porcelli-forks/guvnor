@@ -24,7 +24,6 @@ import static com.fasterxml.jackson.annotation.JsonTypeInfo.As.*;
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.*;
 
 /**
- * @author salaboy
  *         Generic Project type to be used by the Build service.
  */
 @JsonTypeInfo(use = CLASS, include = WRAPPER_OBJECT)

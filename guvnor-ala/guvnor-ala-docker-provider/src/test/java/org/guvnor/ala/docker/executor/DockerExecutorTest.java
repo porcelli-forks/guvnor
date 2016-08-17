@@ -1,9 +1,5 @@
 package org.guvnor.ala.docker.executor;
 
-import org.guvnor.ala.docker.executor.DockerRuntimeExecExecutor;
-import org.guvnor.ala.docker.executor.DockerProvisioningConfigExecutor;
-import org.guvnor.ala.docker.executor.DockerProviderConfigExecutor;
-import org.guvnor.ala.docker.executor.DockerBuildConfigExecutor;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -51,10 +47,12 @@ import static org.guvnor.ala.pipeline.StageUtil.*;
 /**
  * TODO: update me
  */
+
 public class DockerExecutorTest {
 
     private File tempPath;
 
+    
     @Before
     public void setUp() {
         try {
@@ -92,7 +90,7 @@ public class DockerExecutorTest {
         final Stage<ProviderConfig, ProvisioningConfig> runtimeConfig = config( "Docker Runtime Config", ( s ) -> new ContextAwareDockerProvisioningConfig() {
         } );
 
-        final Stage<ProvisioningConfig, RuntimeConfig> runtimeExec = config( "Docker Runtime Exec", ( s ) -> new MyContextAwareDockerRuntimeExecConfig() );
+        final Stage<ProvisioningConfig, RuntimeConfig> runtimeExec = config( "Docker Runtime Exec", ( s ) -> new ContextAwareDockerRuntimeExecConfig() );
 
         final Pipeline pipe = PipelineFactory
                 .startFrom( sourceConfig )
@@ -113,11 +111,11 @@ public class DockerExecutorTest {
                                                                         new DockerProvisioningConfigExecutor(),
                                                                         new DockerRuntimeExecExecutor( runtimeRegistry, dockerAccessInterface ) ) );
         executor.execute( new Input() {{
-            put( "repo-name", "livespark-playground" );
+            put( "repo-name", "drools-workshop" );
             put( "branch", "master" );
             put( "out-dir", tempPath.getAbsolutePath() );
-            put( "origin", "https://github.com/pefernan/livespark-playground" );
-            put( "project-dir", "users-new" );
+            put( "origin", "https://github.com/salaboy/drools-workshop" );
+            put( "project-dir", "drools-webapp-example" );
         }}, pipe, ( Runtime b ) -> System.out.println( b ) );
 
         dockerAccessInterface.dispose();
@@ -134,7 +132,7 @@ public class DockerExecutorTest {
         final Stage<ProviderConfig, ProvisioningConfig> runtimeConfig = config( "Docker Runtime Config", ( s ) -> new ContextAwareDockerProvisioningConfig() {
         } );
 
-        final Stage<ProvisioningConfig, RuntimeConfig> runtimeExec = config( "Docker Runtime Exec", ( s ) -> new MyContextAwareDockerRuntimeExecConfig() );
+        final Stage<ProvisioningConfig, RuntimeConfig> runtimeExec = config( "Docker Runtime Exec", ( s ) -> new ContextAwareDockerRuntimeExecConfig() );
 
         final Pipeline pipe = PipelineFactory
                 .startFrom( providerConfig )
@@ -145,20 +143,13 @@ public class DockerExecutorTest {
                                                                         new DockerProvisioningConfigExecutor(),
                                                                         new DockerRuntimeExecExecutor( runtimeRegistry, dockerAccessInterface ) ) );
         executor.execute( new Input() {{
-            put( "image-name", "salaboy/users-new" );
+            put( "image-name", "kitematic/hello-world-nginx" );
             put( "port-number", "8080" );
+            put( "docker-pull", "true" );
         }}, pipe, ( Runtime b ) -> System.out.println( b ) );
 
         dockerAccessInterface.dispose();
     }
     
-    class MyContextAwareDockerRuntimeExecConfig extends ContextAwareDockerRuntimeExecConfig{
-
-        @Override
-        public boolean isPull() {
-            return true;
-        }
     
-        
-    }
 }

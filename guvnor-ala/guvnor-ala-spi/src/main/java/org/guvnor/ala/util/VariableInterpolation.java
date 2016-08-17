@@ -8,12 +8,11 @@ import java.util.Map;
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
 import net.bytebuddy.implementation.InvocationHandlerAdapter;
+import net.bytebuddy.matcher.ElementMatchers;
 import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.apache.commons.configuration.interpol.ConfigurationInterpolator;
 import org.apache.commons.lang.text.StrLookup;
 import org.apache.commons.lang.text.StrSubstitutor;
-
-import static net.bytebuddy.matcher.ElementMatchers.*;
 
 /**
  * TODO: update me
@@ -80,8 +79,8 @@ public final class VariableInterpolation {
             return (T) new ByteBuddy()
                     .subclass( Object.class )
                     .implement( _interfaces )
-                    .method( returns( String.class ) ).intercept( InvocationHandlerAdapter.of( new InterpolationHandler( instance ) ) )
-                    .method( not( returns( String.class ) ) ).intercept( InvocationHandlerAdapter.of( new ByPassHandler( instance ) ) )
+                    .method( ElementMatchers.any() )
+                    .intercept( InvocationHandlerAdapter.of( new InterpolationHandler( instance ) ) )
                     .make()
                     .load( instance.getClass().getClassLoader(), ClassLoadingStrategy.Default.INJECTION )
                     .getLoaded()
@@ -113,21 +112,4 @@ public final class VariableInterpolation {
             }
         }
     }
-
-    public static class ByPassHandler implements InvocationHandler {
-
-        Object object;
-
-        public ByPassHandler( final Object object ) {
-            this.object = object;
-        }
-
-        @Override
-        public Object invoke( Object proxy,
-                              Method method,
-                              Object[] args ) throws Throwable {
-            return method.invoke( object, args );
-        }
-    }
-
 }

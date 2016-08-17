@@ -12,11 +12,7 @@ import org.guvnor.ala.config.ProvisioningConfig;
         return "${input.port-number}";
     }
 
-    default boolean pull() {
-        return Boolean.valueOf( dockerPullValue() );
-    }
-
-    default String dockerPullValue() {
+    default String getDockerPullValue() {
         return "${input.docker-pull}";
     }
 

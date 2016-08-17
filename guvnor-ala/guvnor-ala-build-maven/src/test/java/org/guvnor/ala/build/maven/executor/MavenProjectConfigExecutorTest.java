@@ -74,10 +74,11 @@ public class MavenProjectConfigExecutorTest {
 
         final PipelineExecutor executor = new PipelineExecutor( asList( new GitConfigExecutor( sourceRegistry ), new MavenProjectConfigExecutor( sourceRegistry ), new MavenBuildConfigExecutor(), new MavenBuildExecConfigExecutor( buildRegistry ) ) );
         executor.execute( new Input() {{
-            put( "repo-name", "livespark-playground" );
+            put( "repo-name", "drools-workshop" );
+            put( "branch", "master" );
             put( "out-dir", tempPath.getAbsolutePath() );
-            put( "origin", "https://github.com/pefernan/livespark-playground" );
-            put( "project-dir", "users-new" );
+            put( "origin", "https://github.com/salaboy/drools-workshop" );
+            put( "project-dir", "drools-webapp-example" );
         }}, pipe, ( Binary b ) -> System.out.println( b.getName() ) );
     }
 

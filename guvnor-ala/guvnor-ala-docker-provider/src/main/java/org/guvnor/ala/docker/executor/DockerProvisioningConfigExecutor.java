@@ -31,7 +31,7 @@ public class DockerProvisioningConfigExecutor implements
 
             @Override
             public boolean isPull() {
-                return dockerRuntimeConfig.pull();
+                return Boolean.valueOf( dockerRuntimeConfig.getDockerPullValue() );
             }
         } );
     }

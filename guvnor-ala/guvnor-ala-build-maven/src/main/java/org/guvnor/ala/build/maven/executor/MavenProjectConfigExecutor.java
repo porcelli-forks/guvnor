@@ -55,7 +55,7 @@ public class MavenProjectConfigExecutor implements BiFunctionConfigExecutor<Sour
 
             @Override
             public String getExpectedBinary() {
-                return project.getArtifact().getArtifactId() + "." + project.getArtifact().getType();
+                return project.getArtifact().getArtifactId() + "-" +  project.getArtifact().getVersion() +  "." + project.getArtifact().getType();
             }
 
             @Override

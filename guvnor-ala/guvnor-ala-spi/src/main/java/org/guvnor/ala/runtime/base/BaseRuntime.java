@@ -27,9 +27,9 @@ public abstract class BaseRuntime implements Runtime {
 
     private String id;
     protected RuntimeConfig config;
-    private RuntimeInfo info;
-    private RuntimeState state;
-    private RuntimeEndpoint endpoint;
+    protected RuntimeInfo info;
+    protected RuntimeState state;
+    protected RuntimeEndpoint endpoint;
     private ProviderId providerId;
 
     public BaseRuntime( final String id,

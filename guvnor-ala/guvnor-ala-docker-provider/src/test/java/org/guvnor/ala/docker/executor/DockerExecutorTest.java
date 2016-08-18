@@ -42,7 +42,12 @@ import org.guvnor.ala.source.git.config.GitConfig;
 import org.guvnor.ala.source.git.executor.GitConfigExecutor;
 
 import static java.util.Arrays.*;
+import java.util.function.Consumer;
+import org.guvnor.ala.docker.model.DockerRuntime;
+import org.guvnor.ala.docker.service.DockerRuntimeService;
 import static org.guvnor.ala.pipeline.StageUtil.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * TODO: update me
@@ -68,7 +73,7 @@ public class DockerExecutorTest {
     }
 
     @Test
-    public void testAPI() {
+    public void testAPI() throws InterruptedException {
         final SourceRegistry sourceRegistry = new InMemorySourceRegistry();
         final BuildRegistry buildRegistry = new InMemoryBuildRegistry();
         final InMemoryRuntimeRegistry runtimeRegistry = new InMemoryRuntimeRegistry();
@@ -110,14 +115,32 @@ public class DockerExecutorTest {
                                                                         new DockerProviderConfigExecutor( runtimeRegistry ),
                                                                         new DockerProvisioningConfigExecutor(),
                                                                         new DockerRuntimeExecExecutor( runtimeRegistry, dockerAccessInterface ) ) );
+        
+        MyConsumer c = new MyConsumer();
         executor.execute( new Input() {{
             put( "repo-name", "drools-workshop" );
             put( "branch", "master" );
             put( "out-dir", tempPath.getAbsolutePath() );
             put( "origin", "https://github.com/salaboy/drools-workshop" );
             put( "project-dir", "drools-webapp-example" );
-        }}, pipe, ( Runtime b ) -> System.out.println( b ) );
-
+        }}, pipe, c );
+        
+        
+        Runtime runtime = c.getRuntime();
+        
+        assertTrue(runtime instanceof DockerRuntime);
+        
+        DockerRuntime dockerRuntime = (DockerRuntime) runtime;
+  
+        DockerRuntimeService dockerRuntimeService = new DockerRuntimeService( dockerAccessInterface );
+        dockerRuntimeService.start( dockerRuntime );
+        
+        assertEquals("Running", dockerRuntime.getState().getStatus());
+        
+        dockerRuntimeService.pause( dockerRuntime );
+        
+        assertEquals("Paused", dockerRuntime.getState().getStatus());
+        
         dockerAccessInterface.dispose();
     }
 
@@ -151,5 +174,18 @@ public class DockerExecutorTest {
         dockerAccessInterface.dispose();
     }
     
+    class MyConsumer implements Consumer<Runtime> {
+
+        private Runtime r;
+
+        @Override
+        public void accept( Runtime r ) {
+            this.r = r;
+        }
+
+        public Runtime getRuntime() {
+            return this.r;
+        }
+    }
     
 }

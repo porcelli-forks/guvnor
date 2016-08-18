@@ -40,6 +40,7 @@ public class DockerRuntimeService implements RuntimeService<DockerRuntime> {
     public void start( final DockerRuntime runtime ) {
         try {
             docker.getDockerClient( runtime.getProviderId() ).startContainer( runtime.getId() );
+            refresh( runtime );
         } catch ( DockerException | InterruptedException ex ) {
             getLogger( DockerProvider.class.getName() ).log( SEVERE, null, ex );
         }
@@ -50,6 +51,7 @@ public class DockerRuntimeService implements RuntimeService<DockerRuntime> {
     public void stop( final DockerRuntime runtime ) {
         try {
             docker.getDockerClient( runtime.getProviderId() ).stopContainer( runtime.getId(), 0 );
+            refresh( runtime );
         } catch ( DockerException | InterruptedException ex ) {
             getLogger( DockerProvider.class.getName() ).log( SEVERE, null, ex );
         }
@@ -57,13 +59,12 @@ public class DockerRuntimeService implements RuntimeService<DockerRuntime> {
 
     @Override
     public void restart( final DockerRuntime runtime ) {
-
         try {
             docker.getDockerClient( runtime.getProviderId() ).restartContainer( runtime.getId() );
+            refresh( runtime );
         } catch ( DockerException | InterruptedException ex ) {
             getLogger( DockerProvider.class.getName() ).log( SEVERE, null, ex );
         }
-
     }
 
     @Override
@@ -72,18 +73,29 @@ public class DockerRuntimeService implements RuntimeService<DockerRuntime> {
             ContainerInfo containerInfo = docker.getDockerClient( runtime.getProviderId() ).inspectContainer( runtime.getId() );
             ContainerState state = containerInfo.state();
             String stateString = "NA";
-            if ( state.running() ) {
+            if ( state.running() && !state.paused() ) {
                 stateString = "Running";
             } else if ( state.paused() ) {
                 stateString = "Paused";
             } else if ( state.restarting() ) {
                 stateString = "Restarting";
+            } else if ( state.oomKilled() ){
+                stateString = "Killed";
             }
             runtime.setState( new DockerRuntimeState( stateString, state.startedAt().toString() ) );
         } catch ( DockerException | InterruptedException ex ) {
             getLogger( DockerRuntime.class.getName() ).log( SEVERE, null, ex );
         }
 
+    }
+
+    public void pause( DockerRuntime runtime ) {
+        try {
+            docker.getDockerClient( runtime.getProviderId() ).pauseContainer( runtime.getId() );
+            refresh( runtime );
+        } catch ( DockerException | InterruptedException ex ) {
+            getLogger( DockerProvider.class.getName() ).log( SEVERE, null, ex );
+        }
     }
 
 }

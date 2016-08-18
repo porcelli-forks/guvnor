@@ -36,6 +36,7 @@ import org.guvnor.ala.source.git.config.GitConfig;
 import org.guvnor.ala.source.git.executor.GitConfigExecutor;
 
 import static java.util.Arrays.*;
+import java.util.function.Consumer;
 import org.arquillian.cube.CubeController;
 import org.arquillian.cube.HostIp;
 import org.arquillian.cube.docker.impl.requirement.RequiresDockerMachine;
@@ -47,8 +48,11 @@ import org.guvnor.ala.wildfly.config.ContextAwareWildflyRuntimeExecConfig;
 import org.guvnor.ala.wildfly.config.WildflyProviderConfig;
 import org.guvnor.ala.wildfly.config.WildflyProviderConfigExecutor;
 import org.guvnor.ala.wildfly.executor.WildflyRuntimeExecExecutor;
+import org.guvnor.ala.wildfly.model.WildflyRuntime;
+import org.guvnor.ala.wildfly.service.WildflyRuntimeService;
 import org.jboss.arquillian.junit.InSequence;
 import org.jboss.arquillian.test.api.ArquillianResource;
+import static org.junit.Assert.assertTrue;
 import org.junit.runner.RunWith;
 
 /**
@@ -126,6 +130,8 @@ public class WildflyExecutorTest {
                                                                         new WildflyProviderConfigExecutor( runtimeRegistry ),
                                                                         
                                                                         new WildflyRuntimeExecExecutor( runtimeRegistry, wildflyAccessInterface ) ) );
+        
+        MyConsumer c = new MyConsumer();
         executor.execute( new Input() {{
             put( "repo-name", "drools-workshop" );
             put( "branch", "master" );
@@ -138,8 +144,18 @@ public class WildflyExecutorTest {
             put( "port",  "8080");
             put( "management-port",  "9990");
             
-        }}, pipe, ( Runtime b ) -> System.out.println( b ) );
-
+        }}, pipe, c );
+        Runtime runtime = c.getRuntime();
+        assertTrue(runtime instanceof WildflyRuntime);
+        
+        WildflyRuntime wildflyRuntime = (WildflyRuntime) runtime;
+        WildflyRuntimeService wildflyRuntimeService = new WildflyRuntimeService( wildflyAccessInterface );
+        
+        wildflyRuntimeService.stop( wildflyRuntime );
+        
+        
+        
+        
         wildflyAccessInterface.dispose();
     }
     
@@ -149,35 +165,21 @@ public class WildflyExecutorTest {
         cc.stop( CONTAINER );
         cc.destroy( CONTAINER );
     }
+    
+    class MyConsumer implements Consumer<Runtime> {
 
-//    @Test
-//    public void testFlexAPI() {
-//        final InMemoryRuntimeRegistry runtimeRegistry = new InMemoryRuntimeRegistry();
-//        final DockerAccessInterface dockerAccessInterface = new DockerAccessInterfaceImpl();
-//
-//        final Stage<Input, ProviderConfig> providerConfig = config( "Docker Provider Config", ( s ) -> new DockerProviderConfig() {
-//        } );
-//
-//        final Stage<ProviderConfig, ProvisioningConfig> runtimeConfig = config( "Docker Runtime Config", ( s ) -> new ContextAwareDockerProvisioningConfig() {
-//        } );
-//
-//        final Stage<ProvisioningConfig, RuntimeConfig> runtimeExec = config( "Docker Runtime Exec", ( s ) -> new MyContextAwareDockerRuntimeExecConfig() );
-//
-//        final Pipeline pipe = PipelineFactory
-//                .startFrom( providerConfig )
-//                .andThen( runtimeConfig )
-//                .andThen( runtimeExec ).buildAs( "my pipe" );
-//
-//        final PipelineExecutor executor = new PipelineExecutor( asList( new DockerProviderConfigExecutor( runtimeRegistry ),
-//                                                                        new DockerProvisioningConfigExecutor(),
-//                                                                        new DockerRuntimeExecExecutor( runtimeRegistry, dockerAccessInterface ) ) );
-//        executor.execute( new Input() {{
-//            put( "image-name", "salaboy/users-new" );
-//            put( "port-number", "8080" );
-//        }}, pipe, ( Runtime b ) -> System.out.println( b ) );
-//
-//        dockerAccessInterface.dispose();
-//    }
+        private Runtime r;
+
+        @Override
+        public void accept( Runtime r ) {
+            this.r = r;
+        }
+
+        public Runtime getRuntime() {
+            return this.r;
+        }
+    }
+    
     
    
 }

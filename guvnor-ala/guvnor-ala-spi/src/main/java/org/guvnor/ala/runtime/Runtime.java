@@ -18,13 +18,11 @@ package org.guvnor.ala.runtime;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.guvnor.ala.config.RuntimeConfig;
-import org.guvnor.ala.runtime.providers.Provider;
 
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.As.*;
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.*;
 
 /**
- * @author salaboy
  *         <p>
  *         This class represent a Runtime (Docker Image running or a WAR deployed into a
  *         server)

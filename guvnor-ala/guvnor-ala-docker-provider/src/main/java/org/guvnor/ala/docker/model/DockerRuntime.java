@@ -26,6 +26,9 @@ public class DockerRuntime extends BaseRuntime {
                           final RuntimeConfig config,
                           final ProviderId providerId ) {
         super( id, config, providerId );
+        this.endpoint = new DockerRuntimeEndpoint();
+        this.info = new DockerRuntimeInfo();
+        this.state = new DockerRuntimeState();
     }
 
     @Override

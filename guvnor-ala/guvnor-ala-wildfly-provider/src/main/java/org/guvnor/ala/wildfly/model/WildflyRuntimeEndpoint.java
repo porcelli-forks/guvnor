@@ -16,23 +16,8 @@
 
 package org.guvnor.ala.wildfly.model;
 
-import org.guvnor.ala.config.RuntimeConfig;
-import org.guvnor.ala.runtime.base.BaseRuntime;
-import org.guvnor.ala.runtime.providers.ProviderId;
+import org.guvnor.ala.runtime.base.BaseRuntimeEndpoint;
 
-public class WildflyRuntime extends BaseRuntime {
+public class WildflyRuntimeEndpoint extends BaseRuntimeEndpoint {
 
-    public WildflyRuntime( final String id,
-                          final RuntimeConfig config,
-                          final ProviderId providerId ) {
-        super( id, config, providerId );
-        this.endpoint = new WildflyRuntimeEndpoint();
-        this.info = new WildflyRuntimeInfo();
-        this.state = new WildflyRuntimeState();
-    }
-
-    @Override
-    public String toString() {
-        return "WildflyRuntime{" + getId() + " }";
-    }
 }

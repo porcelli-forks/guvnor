@@ -21,7 +21,7 @@ import static com.fasterxml.jackson.annotation.JsonTypeInfo.As.*;
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.*;
 
 /**
- * @author salaboy This class provides the definition for a ProviderType.
+ *  This class provides the definition for a ProviderType.
  *         Different provider types can be implemented and discovered at runtime.
  */
 @JsonTypeInfo(use = CLASS, include = WRAPPER_OBJECT)

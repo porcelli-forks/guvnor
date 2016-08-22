@@ -16,8 +16,10 @@
 
 package org.guvnor.ala.pipeline;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.util.List;
 
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.WRAPPER_OBJECT)
 public interface Pipeline {
 
     String getName();

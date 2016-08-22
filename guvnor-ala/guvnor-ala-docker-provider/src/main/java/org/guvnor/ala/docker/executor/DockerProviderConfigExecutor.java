@@ -18,9 +18,12 @@ public class DockerProviderConfigExecutor implements ProviderBuilder<DockerProvi
                                                      ProviderDestroyer,
                                                      FunctionConfigExecutor<DockerProviderConfig, DockerProvider> {
 
-    private final RuntimeRegistry runtimeRegistry;
-
     @Inject
+    private RuntimeRegistry runtimeRegistry;
+
+    public DockerProviderConfigExecutor() {
+    }
+
     public DockerProviderConfigExecutor( final RuntimeRegistry runtimeRegistry ) {
         this.runtimeRegistry = runtimeRegistry;
     }

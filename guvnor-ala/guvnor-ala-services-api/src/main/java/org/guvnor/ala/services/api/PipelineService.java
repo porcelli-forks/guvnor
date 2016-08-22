@@ -16,7 +16,6 @@
 
 package org.guvnor.ala.services.api;
 
-import java.util.List;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -29,6 +28,7 @@ import org.guvnor.ala.pipeline.Pipeline;
 import org.guvnor.ala.services.exceptions.BusinessException;
 
 import static javax.ws.rs.core.MediaType.*;
+import org.guvnor.ala.services.api.itemlist.PipelineList;
 
 @Path("pipelines")
 public interface PipelineService {
@@ -36,7 +36,7 @@ public interface PipelineService {
     @GET
     @Produces(value = APPLICATION_JSON)
     @Path("")
-    List<Pipeline> getAllPipelines() throws BusinessException;
+    PipelineList getAllPipelines() throws BusinessException;
 
     @POST
     @Consumes(value = APPLICATION_JSON)

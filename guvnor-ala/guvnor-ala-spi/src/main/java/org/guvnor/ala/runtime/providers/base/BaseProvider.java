@@ -53,4 +53,11 @@ public abstract class BaseProvider implements Provider {
         return providerType;
     }
 
+    @Override
+    public String toString() {
+        return "Provider{" + "name=" + name + ", config=" + config + ", providerType=" + providerType + '}';
+    }
+    
+    
+
 }

@@ -22,9 +22,6 @@ import org.guvnor.ala.build.Project;
 
 import static org.uberfire.commons.validation.PortablePreconditions.*;
 
-/**
- * @author salaboy
- */
 public class MavenBinary implements Binary {
 
     private String type;

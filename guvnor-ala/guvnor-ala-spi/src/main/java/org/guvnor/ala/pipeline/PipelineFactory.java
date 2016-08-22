@@ -27,17 +27,7 @@ public final class PipelineFactory {
 
             @Override
             public Pipeline buildAs( final String name ) {
-                return new Pipeline() {
-                    @Override
-                    public String getName() {
-                        return name;
-                    }
-
-                    @Override
-                    public List<Stage> getStages() {
-                        return stages;
-                    }
-                };
+                return new BasePipeline(name, stages);
             }
         };
     }

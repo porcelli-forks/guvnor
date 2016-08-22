@@ -16,19 +16,22 @@
 
 package org.guvnor.ala.docker.model;
 
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.guvnor.ala.runtime.providers.base.BaseProviderType;
 
 /**
- * @author salaboy
  */
 public final class DockerProviderType extends BaseProviderType {
 
+    @JsonIgnore
     private static DockerProviderType instance;
 
-    private DockerProviderType() {
+    public DockerProviderType() {
         super( "docker", "1.9.1" );
     }
 
+    @JsonIgnore
     public static DockerProviderType instance() {
         if ( instance == null ) {
             instance = new DockerProviderType();

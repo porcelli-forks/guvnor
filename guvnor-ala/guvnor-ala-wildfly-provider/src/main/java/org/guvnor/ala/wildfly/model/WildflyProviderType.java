@@ -16,17 +16,20 @@
 
 package org.guvnor.ala.wildfly.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.guvnor.ala.runtime.providers.base.BaseProviderType;
 
 
 public final class WildflyProviderType extends BaseProviderType {
 
+    @JsonIgnore
     private static WildflyProviderType instance;
-
-    private WildflyProviderType() {
+    
+    public WildflyProviderType() {
         super( "wildfly", "10.0.0.Final" );
     }
 
+    @JsonIgnore
     public static WildflyProviderType instance() {
         if ( instance == null ) {
             instance = new WildflyProviderType();

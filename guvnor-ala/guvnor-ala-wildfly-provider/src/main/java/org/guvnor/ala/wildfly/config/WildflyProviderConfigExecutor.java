@@ -19,9 +19,12 @@ public class WildflyProviderConfigExecutor implements ProviderBuilder<WildflyPro
         ProviderDestroyer,
         FunctionConfigExecutor<WildflyProviderConfig, WildflyProvider> {
 
-    private final RuntimeRegistry runtimeRegistry;
-
     @Inject
+    private RuntimeRegistry runtimeRegistry;
+
+    public WildflyProviderConfigExecutor() {
+    }
+
     public WildflyProviderConfigExecutor( final RuntimeRegistry runtimeRegistry ) {
         this.runtimeRegistry = runtimeRegistry;
     }

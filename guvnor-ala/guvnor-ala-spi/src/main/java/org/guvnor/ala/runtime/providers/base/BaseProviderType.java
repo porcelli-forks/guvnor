@@ -19,18 +19,18 @@ import org.guvnor.ala.runtime.providers.ProviderType;
 
 public abstract class BaseProviderType implements ProviderType {
 
-    private String providerName;
+    private String providerTypeName;
     private String version;
 
     public BaseProviderType( String providerName,
                              String version ) {
-        this.providerName = providerName;
+        this.providerTypeName = providerName;
         this.version = version;
     }
 
     @Override
     public String getProviderTypeName() {
-        return providerName;
+        return providerTypeName;
     }
 
     @Override
@@ -39,8 +39,8 @@ public abstract class BaseProviderType implements ProviderType {
     }
 
     @Override
-    public void setProviderTypeName( String providerName ) {
-        this.providerName = providerName;
+    public void setProviderTypeName( String providerTypeName ) {
+        this.providerTypeName = providerTypeName;
     }
 
     @Override
@@ -48,4 +48,9 @@ public abstract class BaseProviderType implements ProviderType {
         this.version = version;
     }
 
+    @Override
+    public String toString() {
+        return "ProviderType{" + "providerTypeName=" + providerTypeName + ", version=" + version + '}';
+    }
+    
 }

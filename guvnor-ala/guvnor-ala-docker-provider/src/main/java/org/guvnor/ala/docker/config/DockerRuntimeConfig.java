@@ -19,10 +19,7 @@ package org.guvnor.ala.docker.config;
 import org.guvnor.ala.config.ProvisioningConfig;
 import org.guvnor.ala.config.RuntimeConfig;
 
-/**
- * @author salaboy
- */
-public interface DockerRuntimeConfiguration extends ProvisioningConfig,
+public interface DockerRuntimeConfig extends ProvisioningConfig,
                                                     RuntimeConfig {
     String getImage();
 

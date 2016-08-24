@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.enterprise.context.ApplicationScoped;
 
 import org.uberfire.java.nio.file.Path;
 import org.guvnor.ala.build.Project;
@@ -34,6 +35,7 @@ import org.guvnor.ala.source.Source;
  * All the lookups mechanisms and structures needs to be improved for
  * performance.
  */
+@ApplicationScoped
 public class InMemorySourceRegistry implements SourceRegistry {
 
     private final Map<Path, Repository> repositorySourcesPath;

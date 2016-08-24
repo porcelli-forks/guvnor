@@ -1,8 +1,8 @@
 
 package org.guvnor.ala.wildfly.executor;
 
+import java.io.File;
 import java.util.Optional;
-import static java.util.UUID.randomUUID;
 
 import javax.inject.Inject;
 
@@ -53,18 +53,16 @@ public class WildflyRuntimeExecExecutor<T extends WildflyRuntimeConfiguration> i
         final Optional<WildflyProvider> _wildflyProvider = runtimeRegistry.getProvider( runtimeConfig.getProviderId(), WildflyProvider.class );
 
         WildflyProvider wildflyProvider = _wildflyProvider.get();
-
-        int result = wildfly.getWildflyClient( runtimeConfig.getProviderId() ).deploy( wildflyProvider.getUser(),
-                wildflyProvider.getPassword(), wildflyProvider.getHostId(), Integer.valueOf(wildflyProvider.getManagementPort()), warPath );
+        File file = new File( warPath );
+        int result = wildfly.getWildflyClient( wildflyProvider ).deploy( file );
 
         if ( result != 200 ) {
             throw new ProvisioningException( "Deployment to Wildfly Failed with error code: " + result );
         }
 
-        final String id = randomUUID().toString();
-        String shortId = id.substring( 0, 12 );
+        final String id = file.getName();
 
-        return Optional.of( new WildflyRuntime( shortId, runtimeConfig, wildflyProvider ) );
+        return Optional.of( new WildflyRuntime( id, runtimeConfig, wildflyProvider ) );
     }
 
     @Override
@@ -90,8 +88,12 @@ public class WildflyRuntimeExecExecutor<T extends WildflyRuntimeConfiguration> i
 
     @Override
     public void destroy( final RuntimeId runtimeId ) {
-
-        wildfly.getWildflyClient( runtimeId.getProviderId() ).undeploy();
+        final Optional<WildflyProvider> _wildflyProvider = runtimeRegistry.getProvider( runtimeId.getProviderId(), WildflyProvider.class );
+        WildflyProvider wildflyProvider = _wildflyProvider.get();
+        int result = wildfly.getWildflyClient( wildflyProvider ).undeploy( runtimeId.getId() );
+        if ( result != 200 ) {
+            throw new ProvisioningException( "UnDeployment to Wildfly Failed with error code: " + result );
+        }
         runtimeRegistry.unregisterRuntime( runtimeId );
 
     }

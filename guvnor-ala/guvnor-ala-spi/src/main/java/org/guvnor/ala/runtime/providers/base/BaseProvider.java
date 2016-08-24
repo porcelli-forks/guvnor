@@ -21,26 +21,26 @@ import org.guvnor.ala.runtime.providers.ProviderType;
 
 public abstract class BaseProvider implements Provider {
 
-    protected String name;
+    protected String id;
     protected ProviderConfig config;
     protected ProviderType providerType;
 
     public BaseProvider() {
     }
 
-    public BaseProvider( final String name,
+    public BaseProvider( final String id,
                          final ProviderType providerType ) {
-        this.name = name;
+        this.id = id;
         this.providerType = providerType;
     }
 
     @Override
     public String getId() {
-        return name;
+        return id;
     }
 
-    public void setName( String name ) {
-        this.name = name;
+    public void setId( String id ) {
+        this.id = id;
     }
 
     @Override
@@ -53,9 +53,13 @@ public abstract class BaseProvider implements Provider {
         return providerType;
     }
 
+    public void setConfig( ProviderConfig config ) {
+        this.config = config;
+    }
+
     @Override
     public String toString() {
-        return "Provider{" + "name=" + name + ", config=" + config + ", providerType=" + providerType + '}';
+        return "Provider{" + "id=" + id + ", config=" + config + ", providerType=" + providerType + '}';
     }
     
     

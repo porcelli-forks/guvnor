@@ -25,58 +25,61 @@ import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.util.AnnotationLiteral;
 import javax.inject.Inject;
+
 import org.guvnor.ala.config.ProviderConfig;
 import org.guvnor.ala.config.RuntimeConfig;
 import org.guvnor.ala.registry.RuntimeRegistry;
 import org.guvnor.ala.runtime.providers.Provider;
 import org.guvnor.ala.runtime.providers.ProviderType;
+import org.guvnor.ala.runtime.Runtime;
 import org.guvnor.ala.services.api.RuntimeProvisioningService;
 import org.guvnor.ala.services.api.itemlist.ProviderList;
 import org.guvnor.ala.services.api.itemlist.ProviderTypeList;
 import org.guvnor.ala.services.api.itemlist.RuntimeList;
 import org.guvnor.ala.services.exceptions.BusinessException;
 import org.guvnor.ala.services.rest.factories.ProviderFactory;
+import org.guvnor.ala.services.rest.factories.RuntimeFactory;
+import org.guvnor.ala.services.rest.factories.RuntimeManagerFactory;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 @ApplicationScoped
 public class RestRuntimeProvisioningServiceImpl implements RuntimeProvisioningService {
 
     protected static final Logger LOG = LoggerFactory.getLogger( RestRuntimeProvisioningServiceImpl.class );
-    
+
     @Inject
     private RuntimeRegistry registry;
 
-    private boolean initialized = false;
-
     @Inject
     private BeanManager beanManager;
-    
+
     @Inject
     private ProviderFactory providerFactory;
+    
+    @Inject
+    private RuntimeFactory runtimeFactory;
+    
+    @Inject
+    private RuntimeManagerFactory runtimeManagerFactory;
 
     @PostConstruct
     public void cacheBeans() {
-        LOG.info( "> Initializing ProviderTypes. ");
-        if ( !initialized ) {
-            
-            final Set<Bean<?>> beans = beanManager.getBeans( ProviderType.class, new AnnotationLiteral<Any>() {
-            } );
-            for ( final Bean b : beans ) {
-                try {
-                    // I don't want to register the CDI proxy, I need a fresh instance :(
-                    ProviderType pt = ( ProviderType ) b.getBeanClass().newInstance();
-                    registry.registerProviderType( pt );
-                    LOG.info( "> Registering ProviderType: " + pt.getProviderTypeName());
-                } catch ( InstantiationException | IllegalAccessException ex ) {
-                    LOG.error( "Something went wrong with registering Provider Types!", ex);
-                }
+        LOG.info( "> Initializing ProviderTypes. " );
+        final Set<Bean<?>> beans = beanManager.getBeans( ProviderType.class, new AnnotationLiteral<Any>() {
+        } );
+        for ( final Bean b : beans ) {
+            try {
+                // I don't want to register the CDI proxy, I need a fresh instance :(
+                ProviderType pt = (ProviderType) b.getBeanClass().newInstance();
+                LOG.info( "> Registering ProviderType: " + pt.getProviderTypeName() );
+                registry.registerProviderType( pt );
+            } catch ( InstantiationException | IllegalAccessException ex ) {
+                LOG.error( "Something went wrong with registering Provider Types!", ex );
             }
-            initialized = true;
         }
-        
-      
-        
     }
 
     @Override
@@ -104,32 +107,40 @@ public class RestRuntimeProvisioningServiceImpl implements RuntimeProvisioningSe
 
     @Override
     public String newRuntime( RuntimeConfig conf ) throws BusinessException {
-        throw new UnsupportedOperationException( "Not supported yet." ); //To change body of generated methods, choose Tools | Templates.
+        final Optional<Runtime> newRuntime = runtimeFactory.newRuntime( conf );
+        if ( newRuntime.isPresent() ) {
+            return newRuntime.get().getId();
+        }
+        return null;
     }
 
     @Override
     public void destroyRuntime( String runtimeId ) throws BusinessException {
-        throw new UnsupportedOperationException( "Not supported yet." ); //To change body of generated methods, choose Tools | Templates.
+        Runtime runtimeById = registry.getRuntimeById( runtimeId );
+        runtimeFactory.destroyRuntime( runtimeById );
     }
 
     @Override
     public RuntimeList getAllRuntimes() throws BusinessException {
-        return new RuntimeList(registry.getAllRuntimes());
+        return new RuntimeList( registry.getAllRuntimes() );
     }
 
     @Override
     public void startRuntime( String runtimeId ) throws BusinessException {
-        throw new UnsupportedOperationException( "Not supported yet." ); //To change body of generated methods, choose Tools | Templates.
+        Runtime runtimeById = registry.getRuntimeById( runtimeId );
+        runtimeManagerFactory.startRuntime( runtimeById );
     }
 
     @Override
     public void stopRuntime( String runtimeId ) throws BusinessException {
-        throw new UnsupportedOperationException( "Not supported yet." ); //To change body of generated methods, choose Tools | Templates.
+        Runtime runtimeById = registry.getRuntimeById( runtimeId );
+        runtimeManagerFactory.stopRuntime( runtimeById );
     }
 
     @Override
     public void restartRuntime( String runtimeId ) throws BusinessException {
-        throw new UnsupportedOperationException( "Not supported yet." ); //To change body of generated methods, choose Tools | Templates.
+        Runtime runtimeById = registry.getRuntimeById( runtimeId );
+        runtimeManagerFactory.restartRuntime( runtimeById );
     }
 
 }

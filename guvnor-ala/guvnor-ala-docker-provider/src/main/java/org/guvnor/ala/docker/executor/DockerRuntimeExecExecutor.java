@@ -16,7 +16,6 @@ import com.spotify.docker.client.messages.PortBinding;
 import org.guvnor.ala.config.Config;
 import org.guvnor.ala.config.RuntimeConfig;
 import org.guvnor.ala.docker.access.DockerAccessInterface;
-import org.guvnor.ala.docker.config.DockerRuntimeConfiguration;
 import org.guvnor.ala.docker.config.DockerRuntimeExecConfig;
 import org.guvnor.ala.docker.model.DockerProvider;
 import org.guvnor.ala.docker.model.DockerRuntime;
@@ -28,8 +27,9 @@ import org.guvnor.ala.runtime.RuntimeDestroyer;
 import org.guvnor.ala.runtime.RuntimeId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.guvnor.ala.docker.config.DockerRuntimeConfig;
 
-public class DockerRuntimeExecExecutor<T extends DockerRuntimeConfiguration> implements RuntimeBuilder<T, DockerRuntime>,
+public class DockerRuntimeExecExecutor<T extends DockerRuntimeConfig> implements RuntimeBuilder<T, DockerRuntime>,
                                                                                         RuntimeDestroyer,
                                                                                         FunctionConfigExecutor<T, DockerRuntime> {
 
@@ -45,7 +45,7 @@ public class DockerRuntimeExecExecutor<T extends DockerRuntimeConfiguration> imp
     }
 
     @Override
-    public Optional<DockerRuntime> apply( final DockerRuntimeConfiguration config ) {
+    public Optional<DockerRuntime> apply( final DockerRuntimeConfig config ) {
         final Optional<DockerRuntime> runtime = create( config );
         if ( runtime.isPresent() ) {
             runtimeRegistry.registerRuntime( runtime.get() );
@@ -53,7 +53,7 @@ public class DockerRuntimeExecExecutor<T extends DockerRuntimeConfiguration> imp
         return runtime;
     }
 
-    private Optional<DockerRuntime> create( final DockerRuntimeConfiguration runtimeConfig ) throws ProvisioningException {
+    private Optional<DockerRuntime> create( final DockerRuntimeConfig runtimeConfig ) throws ProvisioningException {
         if ( runtimeConfig.isPull() ) {
             try {
                 LOG.info( "Pulling Docker Image: " + runtimeConfig.getImage());
@@ -113,7 +113,7 @@ public class DockerRuntimeExecExecutor<T extends DockerRuntimeConfiguration> imp
 
     @Override
     public boolean supports( final RuntimeConfig config ) {
-        return config instanceof DockerRuntimeConfiguration;
+        return config instanceof DockerRuntimeConfig;
     }
 
     @Override
@@ -125,7 +125,8 @@ public class DockerRuntimeExecExecutor<T extends DockerRuntimeConfiguration> imp
     @Override
     public void destroy( final RuntimeId runtimeId ) {
         try {
-            docker.getDockerClient( runtimeId.getProviderId() ).killContainer( runtimeId.getId() );
+            // This causes issues with the remote client. Need to investigate
+            //docker.getDockerClient( runtimeId.getProviderId() ).killContainer( runtimeId.getId() );
             docker.getDockerClient( runtimeId.getProviderId() ).removeContainer( runtimeId.getId() );
             runtimeRegistry.unregisterRuntime( runtimeId );
         } catch ( DockerException | InterruptedException ex ) {

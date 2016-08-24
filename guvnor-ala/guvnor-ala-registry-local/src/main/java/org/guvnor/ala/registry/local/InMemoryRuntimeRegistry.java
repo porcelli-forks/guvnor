@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.enterprise.context.ApplicationScoped;
+
 import org.guvnor.ala.registry.RuntimeRegistry;
 import org.guvnor.ala.runtime.Runtime;
 import org.guvnor.ala.runtime.RuntimeId;
@@ -36,6 +38,7 @@ import static org.uberfire.commons.validation.PortablePreconditions.*;
  * more robust and distributed implementation should be provided for real
  * use cases. All the lookups mechanisms and structures needs to be improved for performance.
  */
+@ApplicationScoped
 public class InMemoryRuntimeRegistry implements RuntimeRegistry {
 
     private final Map<String, ProviderType> providerTypes;

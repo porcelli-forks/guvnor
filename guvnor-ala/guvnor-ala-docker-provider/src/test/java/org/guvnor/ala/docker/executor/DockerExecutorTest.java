@@ -45,7 +45,7 @@ import org.guvnor.ala.source.git.executor.GitConfigExecutor;
 import static java.util.Arrays.*;
 import java.util.List;
 import org.guvnor.ala.docker.model.DockerRuntime;
-import org.guvnor.ala.docker.service.DockerRuntimeService;
+import org.guvnor.ala.docker.service.DockerRuntimeManager;
 import static org.guvnor.ala.pipeline.StageUtil.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -137,14 +137,21 @@ public class DockerExecutorTest {
 
         DockerRuntime dockerRuntime = ( DockerRuntime ) runtime;
 
-        DockerRuntimeService dockerRuntimeService = new DockerRuntimeService( dockerAccessInterface );
-        dockerRuntimeService.start( dockerRuntime );
+        DockerRuntimeManager runtimeManager = new DockerRuntimeManager(runtimeRegistry, dockerAccessInterface );
+        
+        runtimeManager.start( dockerRuntime );
 
         assertEquals( "Running", dockerRuntime.getState().getStatus() );
 
-        dockerRuntimeService.pause( dockerRuntime );
+        runtimeManager.pause( dockerRuntime );
 
         assertEquals( "Paused", dockerRuntime.getState().getStatus() );
+        
+        Thread.sleep(3000);
+        
+        runtimeManager.stop( dockerRuntime );
+        
+        Thread.sleep(5000);
 
         dockerRuntimeExecExecutor.destroy( runtime );
 
@@ -152,7 +159,7 @@ public class DockerExecutorTest {
     }
 
     @Test
-    public void testFlexAPI() {
+    public void testFlexAPI() throws InterruptedException {
         final InMemoryRuntimeRegistry runtimeRegistry = new InMemoryRuntimeRegistry();
         final DockerAccessInterface dockerAccessInterface = new DockerAccessInterfaceImpl();
 
@@ -191,15 +198,20 @@ public class DockerExecutorTest {
 
         DockerRuntime dockerRuntime = ( DockerRuntime ) runtime;
         
-        DockerRuntimeService dockerRuntimeService = new DockerRuntimeService( dockerAccessInterface );
-        dockerRuntimeService.start( dockerRuntime );
+        DockerRuntimeManager runtimeManager = new DockerRuntimeManager(runtimeRegistry, dockerAccessInterface );
+        
+        runtimeManager.start( dockerRuntime );
 
         assertEquals( "Running", dockerRuntime.getState().getStatus() );
         
-        dockerRuntimeService.pause( dockerRuntime );
+        runtimeManager.pause( dockerRuntime );
 
         assertEquals( "Paused", dockerRuntime.getState().getStatus() );
 
+        runtimeManager.stop( dockerRuntime );
+        
+        Thread.sleep( 5000 );
+        
         dockerRuntimeExecExecutor.destroy( runtime );
 
         dockerAccessInterface.dispose();

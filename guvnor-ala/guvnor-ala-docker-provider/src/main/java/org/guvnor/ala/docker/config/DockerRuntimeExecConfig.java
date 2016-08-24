@@ -2,7 +2,7 @@ package org.guvnor.ala.docker.config;
 
 import org.guvnor.ala.config.RuntimeConfig;
 
-public interface DockerRuntimeExecConfig extends DockerRuntimeConfiguration,
+public interface DockerRuntimeExecConfig extends DockerRuntimeConfig,
                                                  RuntimeConfig {
 
 }

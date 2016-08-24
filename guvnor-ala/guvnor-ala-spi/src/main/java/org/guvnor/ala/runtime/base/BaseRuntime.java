@@ -32,6 +32,9 @@ public abstract class BaseRuntime implements Runtime {
     protected RuntimeEndpoint endpoint;
     private ProviderId providerId;
 
+    public BaseRuntime() {
+    }
+    
     public BaseRuntime( final String id,
                         final RuntimeConfig config,
                         final ProviderId providerId ) {
@@ -95,4 +98,10 @@ public abstract class BaseRuntime implements Runtime {
         return providerId;
     }
 
+    @Override
+    public String toString() {
+        return "Runtime{" + "id=" + id + ", config=" + config + ", info=" + info + ", state=" + state + ", endpoint=" + endpoint + ", providerId=" + providerId + '}';
+    }
+
+    
 }

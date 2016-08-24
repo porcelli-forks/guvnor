@@ -2,12 +2,10 @@
 package org.guvnor.ala.wildfly.config;
 
 import java.util.Optional;
-
 import javax.inject.Inject;
 
 import org.guvnor.ala.config.Config;
 import org.guvnor.ala.config.ProviderConfig;
-
 import org.guvnor.ala.pipeline.FunctionConfigExecutor;
 import org.guvnor.ala.registry.RuntimeRegistry;
 import org.guvnor.ala.runtime.providers.ProviderBuilder;
@@ -16,15 +14,12 @@ import org.guvnor.ala.runtime.providers.ProviderId;
 import org.guvnor.ala.wildfly.model.WildflyProvider;
 
 public class WildflyProviderConfigExecutor implements ProviderBuilder<WildflyProviderConfig, WildflyProvider>,
-        ProviderDestroyer,
-        FunctionConfigExecutor<WildflyProviderConfig, WildflyProvider> {
+                                                      ProviderDestroyer,
+                                                      FunctionConfigExecutor<WildflyProviderConfig, WildflyProvider> {
 
-    @Inject
     private RuntimeRegistry runtimeRegistry;
 
-    public WildflyProviderConfigExecutor() {
-    }
-
+    @Inject
     public WildflyProviderConfigExecutor( final RuntimeRegistry runtimeRegistry ) {
         this.runtimeRegistry = runtimeRegistry;
     }
@@ -32,8 +27,8 @@ public class WildflyProviderConfigExecutor implements ProviderBuilder<WildflyPro
     @Override
     public Optional<WildflyProvider> apply( final WildflyProviderConfig wildflyProviderConfig ) {
         final WildflyProvider provider = new WildflyProvider( wildflyProviderConfig.getName(), wildflyProviderConfig.getHostIp(),
-                wildflyProviderConfig.getPort(), wildflyProviderConfig.getManagementPort(), 
-                wildflyProviderConfig.getUser(), wildflyProviderConfig.getPassword() );
+                                                              wildflyProviderConfig.getPort(), wildflyProviderConfig.getManagementPort(),
+                                                              wildflyProviderConfig.getUser(), wildflyProviderConfig.getPassword() );
         runtimeRegistry.registerProvider( provider );
         return Optional.of( provider );
     }

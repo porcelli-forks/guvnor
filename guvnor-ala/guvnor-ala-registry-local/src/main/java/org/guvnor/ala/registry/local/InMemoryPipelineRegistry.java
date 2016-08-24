@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.enterprise.context.ApplicationScoped;
 
 import org.guvnor.ala.pipeline.Pipeline;
 import org.guvnor.ala.registry.PipelineRegistry;
@@ -30,6 +31,7 @@ import org.guvnor.ala.registry.PipelineRegistry;
  * use cases. All the lookups mechanisms and structures needs to be improved for
  * performance.
  */
+@ApplicationScoped
 public class InMemoryPipelineRegistry implements PipelineRegistry {
 
     private final Map<String, Pipeline> pipelineByName;

@@ -20,8 +20,12 @@ import org.guvnor.ala.runtime.providers.base.BaseProvider;
 
 public class DockerProvider extends BaseProvider implements ProviderConfig {
 
-    private final String hostId;
+    private String hostId;
 
+    public DockerProvider() {
+    }
+
+    
     public DockerProvider( final String name,
                            final String hostId ) {
         super( name, DockerProviderType.instance() );
@@ -31,4 +35,9 @@ public class DockerProvider extends BaseProvider implements ProviderConfig {
     public String getHostId() {
         return hostId;
     }
+
+    public void setHostId( String hostId ) {
+        this.hostId = hostId;
+    }
+    
 }

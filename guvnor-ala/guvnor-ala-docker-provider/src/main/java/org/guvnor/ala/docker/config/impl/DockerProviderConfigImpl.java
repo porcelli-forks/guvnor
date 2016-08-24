@@ -14,26 +14,33 @@
  * limitations under the License.
  */
 
-package org.guvnor.ala.docker.model;
+package org.guvnor.ala.docker.config.impl;
 
-import org.guvnor.ala.config.RuntimeConfig;
-import org.guvnor.ala.runtime.base.BaseRuntime;
-import org.guvnor.ala.runtime.providers.ProviderId;
+import org.guvnor.ala.docker.config.DockerProviderConfig;
 
-public class DockerRuntime extends BaseRuntime {
+public class DockerProviderConfigImpl implements DockerProviderConfig {
 
-    public DockerRuntime() {
+    private String name;
+    private String hostIp;
+
+    @Override
+    public String getHostIp() {
+        return ( hostIp != null ) ? hostIp : DockerProviderConfig.super.getHostIp();
     }
 
-    public DockerRuntime( final String id,
-                          final RuntimeConfig config,
-                          final ProviderId providerId ) {
-        super( id, config, providerId );
-        this.endpoint = new DockerRuntimeEndpoint();
-        this.info = new DockerRuntimeInfo();
-        this.state = new DockerRuntimeState();
+    @Override
+    public String getName() {
+        return ( name != null ) ? name : DockerProviderConfig.super.getName();
     }
 
+    public void setName( String name ) {
+        this.name = name;
+    }
+
+    public void setHostIp( String hostIp ) {
+        this.hostIp = hostIp;
+    }
     
     
+
 }

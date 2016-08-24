@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.enterprise.context.ApplicationScoped;
 
 import org.guvnor.ala.build.Binary;
 import org.guvnor.ala.registry.BuildRegistry;
@@ -29,6 +30,7 @@ import org.guvnor.ala.registry.BuildRegistry;
  * more robust and distributed implementation should be provided for real
  * use cases. All the lookups mechanisms and structures needs to be improved for performance.
  */
+@ApplicationScoped
 public class InMemoryBuildRegistry implements BuildRegistry {
 
     private final Map<String, Binary> binariesByName;

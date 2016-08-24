@@ -18,7 +18,7 @@ public class ContextAwareDockerRuntimeExecConfig implements
     @Override
     public void setContext( final Map<String, ?> context ) {
         this.context = context;
-        final DockerRuntimeConfiguration dockerRuntimeConfiguration = (DockerRuntimeConfiguration) context.get( "docker-runtime-config" );
+        final DockerRuntimeConfig dockerRuntimeConfiguration = (DockerRuntimeConfig) context.get( "docker-runtime-config" );
         this.providerId = dockerRuntimeConfiguration.getProviderId();
         this.image = dockerRuntimeConfiguration.getImage();
         this.port = dockerRuntimeConfiguration.getPort();

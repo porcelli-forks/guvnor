@@ -3,12 +3,11 @@
     xmlns="http://jboss.org/schema/arquillian"
     xsi:schemaLocation="http://jboss.org/schema/arquillian
     http://jboss.org/schema/arquillian/arquillian_1_0.xsd">
-
     <extension qualifier="docker">
-        
-         <property name="machineName">dev</property>
+        <property name="machineName">dev</property>
         <property name="autoStartContainers">[none]</property>
         <property name="serverVersion">1.23</property>
+        <property name="definitionFormat">CUBE</property>
         <property name="dockerContainers">
             swarm:
               buildImage:

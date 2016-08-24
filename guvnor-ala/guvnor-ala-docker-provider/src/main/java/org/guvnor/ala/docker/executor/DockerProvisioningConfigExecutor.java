@@ -4,16 +4,16 @@ import java.util.Optional;
 
 import org.guvnor.ala.config.Config;
 import org.guvnor.ala.docker.config.DockerProvisioningConfig;
-import org.guvnor.ala.docker.config.DockerRuntimeConfiguration;
 import org.guvnor.ala.pipeline.FunctionConfigExecutor;
 import org.guvnor.ala.runtime.providers.ProviderId;
+import org.guvnor.ala.docker.config.DockerRuntimeConfig;
 
 public class DockerProvisioningConfigExecutor implements
-                                              FunctionConfigExecutor<DockerProvisioningConfig, DockerRuntimeConfiguration> {
+                                              FunctionConfigExecutor<DockerProvisioningConfig, DockerRuntimeConfig> {
 
     @Override
-    public Optional<DockerRuntimeConfiguration> apply( final DockerProvisioningConfig dockerRuntimeConfig ) {
-        return Optional.of( new DockerRuntimeConfiguration() {
+    public Optional<DockerRuntimeConfig> apply( final DockerProvisioningConfig dockerRuntimeConfig ) {
+        return Optional.of(new DockerRuntimeConfig() {
             @Override
             public ProviderId getProviderId() {
                 return dockerRuntimeConfig.getProviderId();

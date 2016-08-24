@@ -1,3 +1,4 @@
+
 package org.guvnor.ala.wildfly.executor.tests;
 
 import java.io.File;
@@ -60,17 +61,17 @@ import org.junit.runner.RunWith;
  */
 @RunWith( ArquillianConditionalRunner.class )
 @RequiresDockerMachine( name = "default" )
-public class WildflyExecutorTest {
-
+public class WildflyClientTest {
+    
     private static final String CONTAINER = "swarm";
     private File tempPath;
     
     @HostIp
     private String ip;
-
+    
     @ArquillianResource
     private CubeController cc;
-
+    
     @Before
     public void setUp() {
         try {
@@ -79,7 +80,7 @@ public class WildflyExecutorTest {
             e.printStackTrace();
         }
     }
-
+    
     @After
     public void tearDown() {
         FileUtils.deleteQuietly( tempPath );
@@ -91,7 +92,7 @@ public class WildflyExecutorTest {
         cc.create( CONTAINER );
         cc.start( CONTAINER );
     }
-
+    
     @Test
     @InSequence( 2 )
     public void testAPI() {
@@ -99,22 +100,21 @@ public class WildflyExecutorTest {
         final BuildRegistry buildRegistry = new InMemoryBuildRegistry();
         final InMemoryRuntimeRegistry runtimeRegistry = new InMemoryRuntimeRegistry();
         final WildflyAccessInterface wildflyAccessInterface = new WildflyAccessInterfaceImpl();
-
-        final Stage<Input, SourceConfig> sourceConfig = config( "Git Source", ( s ) -> new GitConfig() {
+        
+        final Stage<Input, SourceConfig> sourceConfig = config( "Git Source", (s) -> new GitConfig() {
         } );
-        final Stage<SourceConfig, ProjectConfig> projectConfig = config( "Maven Project", ( s ) -> new MavenProjectConfig() {
+        final Stage<SourceConfig, ProjectConfig> projectConfig = config( "Maven Project", (s) -> new MavenProjectConfig() {
         } );
-        final Stage<ProjectConfig, BuildConfig> buildConfig = config( "Maven Build Config", ( s ) -> new MavenBuildConfig() {
+        final Stage<ProjectConfig, BuildConfig> buildConfig = config( "Maven Build Config", (s) -> new MavenBuildConfig() {
         } );
         
-        final Stage<BuildConfig, BinaryConfig> buildExec = config( "Maven Build", ( s ) -> new MavenBuildExecConfig() {
+        final Stage<BuildConfig, BinaryConfig> buildExec = config( "Maven Build", (s) -> new MavenBuildExecConfig() {
         } );
-        final Stage<BinaryConfig, ProviderConfig> providerConfig = config( "Wildfly Provider Config", ( s ) -> new WildflyProviderConfig() {
+        final Stage<BinaryConfig, ProviderConfig> providerConfig = config( "Wildfly Provider Config", (s) -> new WildflyProviderConfig() {
         } );
-
-       
-        final Stage<ProviderConfig, RuntimeConfig> runtimeExec = config( "Wildfly Runtime Exec", ( s ) -> new ContextAwareWildflyRuntimeExecConfig() );
-
+        
+        final Stage<ProviderConfig, RuntimeConfig> runtimeExec = config( "Wildfly Runtime Exec", (s) -> new ContextAwareWildflyRuntimeExecConfig() );
+        
         final Pipeline pipe = PipelineFactory
                 .startFrom( sourceConfig )
                 .andThen( projectConfig )
@@ -122,38 +122,42 @@ public class WildflyExecutorTest {
                 .andThen( buildExec )
                 .andThen( providerConfig )
                 .andThen( runtimeExec ).buildAs( "my pipe" );
-
+        WildflyRuntimeExecExecutor wildflyRuntimeExecExecutor = new WildflyRuntimeExecExecutor( runtimeRegistry, wildflyAccessInterface );
         final PipelineExecutor executor = new PipelineExecutor( asList( new GitConfigExecutor( sourceRegistry ),
-                                                                        new MavenProjectConfigExecutor( sourceRegistry ),
-                                                                        new MavenBuildConfigExecutor(),
-                                                                        new MavenBuildExecConfigExecutor( buildRegistry ),
-                                                                        new WildflyProviderConfigExecutor( runtimeRegistry ),
-                                                                        
-                                                                        new WildflyRuntimeExecExecutor( runtimeRegistry, wildflyAccessInterface ) ) );
+                new MavenProjectConfigExecutor( sourceRegistry ),
+                new MavenBuildConfigExecutor(),
+                new MavenBuildExecConfigExecutor( buildRegistry ),
+                new WildflyProviderConfigExecutor( runtimeRegistry ),
+                wildflyRuntimeExecExecutor ) );
         
         MyConsumer c = new MyConsumer();
-        executor.execute( new Input() {{
-            put( "repo-name", "drools-workshop" );
-            put( "branch", "master" );
-            put( "out-dir", tempPath.getAbsolutePath() );
-            put( "origin", "https://github.com/salaboy/drools-workshop" );
-            put( "project-dir", "drools-webapp-example" );
-            put( "wildfly-user", "admin" );
-            put( "wildfly-password", "Admin#70365" );
-            put( "host",  ip);
-            put( "port",  "8080");
-            put( "management-port",  "9990");
-            
-        }}, pipe, c );
+        executor.execute( new Input() {
+            {
+                put( "repo-name", "drools-workshop" );
+                put( "branch", "master" );
+                put( "out-dir", tempPath.getAbsolutePath() );
+                put( "origin", "https://github.com/salaboy/drools-workshop" );
+                put( "project-dir", "drools-webapp-example" );
+                put( "wildfly-user", "admin" );
+                put( "wildfly-password", "Admin#70365" );
+                put( "host", ip );
+                put( "port", "8080" );
+                put( "management-port", "9990" );
+                
+            }
+        }, pipe, c );
         Runtime runtime = c.getRuntime();
-        assertTrue(runtime instanceof WildflyRuntime);
+        assertTrue( runtime instanceof WildflyRuntime );
         
-        WildflyRuntime wildflyRuntime = (WildflyRuntime) runtime;
-        WildflyRuntimeManager runtimeManager = new WildflyRuntimeManager(runtimeRegistry, wildflyAccessInterface );
-       
+        WildflyRuntime wildflyRuntime = ( WildflyRuntime ) runtime;
+        
+        WildflyRuntimeManager runtimeManager = new WildflyRuntimeManager( runtimeRegistry, wildflyAccessInterface );
+        
+        runtimeManager.start( wildflyRuntime );
         
         runtimeManager.stop( wildflyRuntime );
-
+        
+        wildflyRuntimeExecExecutor.destroy( wildflyRuntime );
         
         wildflyAccessInterface.dispose();
     }
@@ -166,19 +170,17 @@ public class WildflyExecutorTest {
     }
     
     class MyConsumer implements Consumer<Runtime> {
-
+        
         private Runtime r;
-
+        
         @Override
         public void accept( Runtime r ) {
             this.r = r;
         }
-
+        
         public Runtime getRuntime() {
             return this.r;
         }
     }
     
-    
-   
 }

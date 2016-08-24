@@ -55,7 +55,7 @@
         </exclusion>
 
       </exclusions>
-    </dependency>
+    </dependency>  
     <dependency>
       <groupId>org.guvnor</groupId>
       <artifactId>guvnor-ala-source-git</artifactId>
@@ -63,6 +63,33 @@
     <dependency>
       <groupId>org.guvnor</groupId>
       <artifactId>guvnor-ala-build-maven</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.guvnor</groupId>
+      <artifactId>guvnor-ala-registry-local</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.guvnor</groupId>
+      <artifactId>guvnor-ala-docker-provider</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>com.spotify</groupId>
+        <artifactId>docker-client</artifactId>
+        <classifier>shaded</classifier>
+    </dependency>
+     <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+       <exclusions>
+         <exclusion>
+           <groupId>commons-logging</groupId>
+           <artifactId>commons-logging</artifactId>
+         </exclusion>
+       </exclusions>
+     </dependency>
+    <dependency>
+      <groupId>org.guvnor</groupId>
+      <artifactId>guvnor-ala-wildfly-provider</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jboss.resteasy</groupId>

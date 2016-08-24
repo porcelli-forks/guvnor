@@ -1,7 +1,6 @@
 package org.guvnor.ala.docker.executor;
 
 import java.util.Optional;
-
 import javax.inject.Inject;
 
 import org.guvnor.ala.config.Config;
@@ -18,12 +17,9 @@ public class DockerProviderConfigExecutor implements ProviderBuilder<DockerProvi
                                                      ProviderDestroyer,
                                                      FunctionConfigExecutor<DockerProviderConfig, DockerProvider> {
 
-    @Inject
     private RuntimeRegistry runtimeRegistry;
 
-    public DockerProviderConfigExecutor() {
-    }
-
+    @Inject
     public DockerProviderConfigExecutor( final RuntimeRegistry runtimeRegistry ) {
         this.runtimeRegistry = runtimeRegistry;
     }
@@ -31,6 +27,7 @@ public class DockerProviderConfigExecutor implements ProviderBuilder<DockerProvi
     @Override
     public Optional<DockerProvider> apply( final DockerProviderConfig dockerProviderConfig ) {
         final DockerProvider provider = new DockerProvider( dockerProviderConfig.getName(), dockerProviderConfig.getHostIp() );
+        provider.setConfig( dockerProviderConfig );
         runtimeRegistry.registerProvider( provider );
         return Optional.of( provider );
     }

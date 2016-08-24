@@ -21,6 +21,9 @@ import java.io.File;
 import java.io.IOException;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreType;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
@@ -35,6 +38,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.jboss.dmr.ModelNode;
 
 import static java.lang.System.*;
+import java.util.Date;
 import static java.util.logging.Level.*;
 import static java.util.logging.Logger.*;
 import static org.apache.http.entity.ContentType.APPLICATION_JSON;
@@ -43,6 +47,7 @@ import static org.apache.http.entity.mime.MultipartEntityBuilder.create;
 import static org.apache.http.impl.client.HttpClients.*;
 import static org.apache.http.entity.ContentType.create;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.util.EntityUtils;
 
 /**
  * Based on: https://github.com/heiko-braun/http-upload
@@ -87,7 +92,6 @@ public class WildflyClient {
         post.addHeader( "X-Management-Client-Name", "HAL" );
 
         // the file to be uploaded
-       
         FileBody fileBody = new FileBody( file );
 
         // the DMR operation
@@ -97,7 +101,7 @@ public class WildflyClient {
         operation.get( "runtime-name" ).set( file.getName() );
         operation.get( "enabled" ).set( true );
         operation.get( "content" ).add().get( "input-stream-index" ).set( 0 );  // point to the multipart index used
-        
+
         System.out.println( "> Deploying -> " + operation.toJSONString( true ) );
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         try {
@@ -261,57 +265,60 @@ public class WildflyClient {
 
     }
 
-    public WildflyAppState getAppState( String id ) {
-        // the digest auth backend
-//        CredentialsProvider credsProvider = new BasicCredentialsProvider();
-//        credsProvider.setCredentials(
-//                new AuthScope( host, port ),
-//                new UsernamePasswordCredentials( user, password ) );
-//
-//        CloseableHttpClient httpclient = custom()
-//                .setDefaultCredentialsProvider( credsProvider )
-//                .build();
-//        
-//        // the DMR operation
-//        ModelNode operation = new ModelNode();
-//        
-//        operation.get( "operation" ).set( "add" );
-//        
-//        operation.get( "enabled" ).set( true );
-//        operation.get( "content" ).add().get( "input-stream-index" ).set( 0 );  // point to the multipart index used
-//
-//        ByteArrayOutputStream bout = new ByteArrayOutputStream();
-//        try {
-//            operation.writeBase64( bout );
-//        } catch ( IOException ex ) {
-//            getLogger(WildflyClient.class.getName() ).log( SEVERE, null, ex );
-//        }
-//
-//        // the multipart
-//        MultipartEntityBuilder builder = create();
-//        builder.setMode( BROWSER_COMPATIBLE );
-//        
-//        builder.addPart( "operation", new ByteArrayBody( bout.toByteArray(), create( "application/dmr-encoded" ), "blob" ) );
-//        HttpEntity entity = builder.build();
-//        HttpPost post = new HttpPost( "http://" + host + ":" + port + "/" );
-//        try {
-//            entity.writeTo(System.out);
-//        } catch ( IOException ex ) {
-//            Logger.getLogger( WildflyClient.class.getName() ).log( Level.SEVERE, null, ex );
-//        }
-//        post.setEntity( entity );
-//
-//        try {
-//            HttpResponse response = httpclient.execute( post );
-//
-//            out.println( ">>> Deploying Response Entity: " + response.getEntity() );
-//            out.println( ">>> Deploying Response Satus: " + response.getStatusLine().getStatusCode() );
-//           
-//        } catch ( IOException ex ) {
-//            ex.printStackTrace();
-//            getLogger(WildflyClient.class.getName() ).log( SEVERE, null, ex );
-//        }
+    public WildflyAppState getAppState( String deploymentName ) {
+        CredentialsProvider credsProvider = new BasicCredentialsProvider();
+        credsProvider.setCredentials(
+                new AuthScope( host, managementPort ),
+                new UsernamePasswordCredentials( user, password ) );
 
-        return new WildflyAppState();
+        CloseableHttpClient httpclient = custom()
+                .setDefaultCredentialsProvider( credsProvider )
+                .build();
+
+        final HttpPost post = new HttpPost( "http://" + host + ":" + managementPort + "/management" );
+
+        post.addHeader( "X-Management-Client-Name", "GUVNOR-ALA" );
+
+        // the DMR operation
+        ModelNode operation = new ModelNode();
+        operation.get( "operation" ).set( "read-resource" );
+        operation.get( "address" ).add( "deployment", deploymentName );
+        operation.get( "resolve-expressions" ).set( "true" );
+        System.out.println( "> REFRESHING -> " + operation.toJSONString( true ) );
+        try {
+            post.setEntity( new StringEntity( operation.toJSONString( true ), APPLICATION_JSON ) );
+        } catch ( Exception e ) {
+            e.printStackTrace();
+        }
+
+        try {
+            HttpResponse response = httpclient.execute( post );
+            String json = EntityUtils.toString( response.getEntity() );
+            JsonParser parser = new JsonParser();
+
+            JsonElement element = parser.parse( json );
+            // use the isxxx methods to find out the type of jsonelement. In our
+            // example we know that the root object is the Albums object and
+            // contains an array of dataset objects
+            if ( element.isJsonObject() ) {
+                JsonObject outcome = element.getAsJsonObject();
+                JsonObject result = outcome.get( "result" ).getAsJsonObject();
+                String enabled = result.get( "enabled" ).getAsString();
+                String state = "Stopped";
+                if ( enabled.equals( "true" ) ) {
+                    state = "Running";
+                }
+                return new WildflyAppState( state, new Date() );
+            }
+            out.println( ">>> Refresh Response Entity: " + json );
+            out.println( ">>> Refresh Response Satus: " + response.getStatusLine().getStatusCode() );
+            System.err.println( response.getStatusLine().getStatusCode() );
+
+        } catch ( IOException ex ) {
+            ex.printStackTrace();
+            getLogger( WildflyClient.class.getName() ).log( SEVERE, null, ex );
+        }
+        return null;
+
     }
 }

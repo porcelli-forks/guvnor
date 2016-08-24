@@ -20,7 +20,7 @@ import org.guvnor.ala.runtime.RuntimeState;
 
 public class BaseRuntimeState implements RuntimeState {
 
-    private String status;
+    private String status = "NA";
     private String startedAt;
 
     public BaseRuntimeState() {

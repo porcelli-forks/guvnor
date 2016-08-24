@@ -52,6 +52,7 @@ import org.guvnor.ala.wildfly.model.WildflyRuntime;
 import org.guvnor.ala.wildfly.service.WildflyRuntimeManager;
 import org.jboss.arquillian.junit.InSequence;
 import org.jboss.arquillian.test.api.ArquillianResource;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.junit.runner.RunWith;
 
@@ -122,14 +123,13 @@ public class WildflyExecutorTest {
                 .andThen( buildExec )
                 .andThen( providerConfig )
                 .andThen( runtimeExec ).buildAs( "my pipe" );
-
+        WildflyRuntimeExecExecutor wildflyRuntimeExecExecutor = new WildflyRuntimeExecExecutor( runtimeRegistry, wildflyAccessInterface );
         final PipelineExecutor executor = new PipelineExecutor( asList( new GitConfigExecutor( sourceRegistry ),
                                                                         new MavenProjectConfigExecutor( sourceRegistry ),
                                                                         new MavenBuildConfigExecutor(),
                                                                         new MavenBuildExecConfigExecutor( buildRegistry ),
                                                                         new WildflyProviderConfigExecutor( runtimeRegistry ),
-                                                                        
-                                                                        new WildflyRuntimeExecExecutor( runtimeRegistry, wildflyAccessInterface ) ) );
+                                                                        wildflyRuntimeExecExecutor) );
         
         MyConsumer c = new MyConsumer();
         executor.execute( new Input() {{
@@ -148,13 +148,18 @@ public class WildflyExecutorTest {
         Runtime runtime = c.getRuntime();
         assertTrue(runtime instanceof WildflyRuntime);
         
-        WildflyRuntime wildflyRuntime = (WildflyRuntime) runtime;
-        WildflyRuntimeManager runtimeManager = new WildflyRuntimeManager(runtimeRegistry, wildflyAccessInterface );
+         WildflyRuntime wildflyRuntime = ( WildflyRuntime ) runtime;
        
-        
-        runtimeManager.stop( wildflyRuntime );
+        WildflyRuntimeManager runtimeManager = new WildflyRuntimeManager( runtimeRegistry, wildflyAccessInterface );
 
-        
+        runtimeManager.start( wildflyRuntime );
+
+        assertEquals( "Running", wildflyRuntime.getState().getStatus() );
+        runtimeManager.stop( wildflyRuntime );
+        assertEquals( "Stopped", wildflyRuntime.getState().getStatus() );
+
+        wildflyRuntimeExecExecutor.destroy( wildflyRuntime );
+
         wildflyAccessInterface.dispose();
     }
     

@@ -63,6 +63,10 @@
             <artifactId>weld-se-core</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.guvnor</groupId>
             <artifactId>guvnor-ala-source-git</artifactId>
             <scope>test</scope>
@@ -77,7 +81,7 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>org.jboss.arquillian.junit</groupId>
             <artifactId>arquillian-junit-standalone</artifactId>
             <scope>test</scope>

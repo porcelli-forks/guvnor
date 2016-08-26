@@ -10,4 +10,7 @@ public class Input
         implements Map<String, String>,
                    Config {
 
+    public Input() {
+    }
+    
 }

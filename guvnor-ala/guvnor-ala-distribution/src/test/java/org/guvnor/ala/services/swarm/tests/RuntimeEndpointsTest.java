@@ -39,8 +39,6 @@ public class RuntimeEndpointsTest {
         JAXRSArchive deployment = ShrinkWrap.create( JAXRSArchive.class );
         deployment.setContextRoot( "/api" );
         deployment.addPackages( true, "com.google.common" );
-        deployment.addClass( org.apache.commons.lang.text.StrLookup.class );
-        deployment.addClass( org.apache.commons.lang.text.StrSubstitutor.class );
         deployment.addClass( UnixConnectionSocketFactory.class );
         deployment.addPackages( true, "org.apache.http" );
 

@@ -14,16 +14,26 @@
  * limitations under the License.
  */
 
-package org.guvnor.ala.pipeline;
+package org.guvnor.ala.build.maven.config.impl;
 
-import java.util.List;
+import org.guvnor.ala.build.maven.config.MavenProjectConfig;
 
-public interface Pipeline {
+public class MavenProjectConfigImpl implements MavenProjectConfig {
 
-    String getName();
+    private String projectDir;
 
-    List<Stage> getStages();
-    
-    PipelineConfig getConfig();
+    @Override
+    public String getProjectDir() {
+        return ( projectDir != null ) ? projectDir : MavenProjectConfig.super.getProjectDir();
+    }
+
+    public void setProjectDir( String projectDir ) {
+        this.projectDir = projectDir;
+    }
+
+    @Override
+    public String toString() {
+        return "MavenProjectConfigImpl{" + "projectDir=" + projectDir + '}';
+    }
 
 }

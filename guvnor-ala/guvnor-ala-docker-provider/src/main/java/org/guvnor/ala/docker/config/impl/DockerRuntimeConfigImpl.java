@@ -73,4 +73,9 @@ public class DockerRuntimeConfigImpl implements DockerRuntimeConfig {
         this.providerId = providerId;
     }
 
+    @Override
+    public String toString() {
+        return "DockerRuntimeConfigImpl{" + "image=" + image + ", port=" + port + ", pull=" + pull + ", providerId=" + providerId + '}';
+    }
+
 }

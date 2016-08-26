@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package org.guvnor.ala.pipeline;
+package org.guvnor.ala.build.maven.config.impl;
 
-import java.util.List;
+import org.guvnor.ala.build.maven.config.MavenBuildExecConfig;
 
-public interface Pipeline {
+public class MavenBuildExecConfigImpl implements MavenBuildExecConfig {
 
-    String getName();
-
-    List<Stage> getStages();
+    @Override
+    public String toString() {
+        return "MavenBuildExecConfigImpl{" + '}';
+    }
     
-    PipelineConfig getConfig();
-
 }

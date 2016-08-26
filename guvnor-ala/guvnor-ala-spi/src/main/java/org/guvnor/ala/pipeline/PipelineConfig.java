@@ -16,14 +16,14 @@
 
 package org.guvnor.ala.pipeline;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.util.List;
+import org.guvnor.ala.config.Config;
 
-public interface Pipeline {
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.WRAPPER_OBJECT)
+public interface PipelineConfig {
 
     String getName();
 
-    List<Stage> getStages();
-    
-    PipelineConfig getConfig();
-
+    List<Config> getConfigStages();
 }

@@ -16,34 +16,35 @@
 
 package org.guvnor.ala.docker.config.impl;
 
-import org.guvnor.ala.docker.config.DockerProviderConfig;
+import org.guvnor.ala.docker.config.DockerBuildConfig;
 
-public class DockerProviderConfigImpl implements DockerProviderConfig {
+public class DockerBuildConfigImpl implements DockerBuildConfig {
 
-    private String name;
-    private String hostIp;
-
-    @Override
-    public String getHostIp() {
-        return ( hostIp != null ) ? hostIp : DockerProviderConfig.super.getHostIp();
-    }
+    private String username;
+    private String password;
+    private Boolean push;
 
     @Override
-    public String getName() {
-        return ( name != null ) ? name : DockerProviderConfig.super.getName();
+    public boolean push() {
+        return ( push != null ) ? push : DockerBuildConfig.super.push();
+
     }
 
-    public void setName( String name ) {
-        this.name = name;
+    @Override
+    public String getPassword() {
+        return ( password != null ) ? password : DockerBuildConfig.super.getPassword();
     }
 
-    public void setHostIp( String hostIp ) {
-        this.hostIp = hostIp;
+    @Override
+    public String getUsername() {
+        return ( username != null ) ? username : DockerBuildConfig.super.getUsername();
     }
 
     @Override
     public String toString() {
-        return "DockerProviderConfigImpl{" + "name=" + name + ", hostIp=" + hostIp + '}';
+        return "DockerBuildConfigImpl{" + "username=" + username + ", password=" + password + ", push=" + push + '}';
     }
+    
+    
 
 }

@@ -24,11 +24,12 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
-import org.guvnor.ala.pipeline.Pipeline;
 import org.guvnor.ala.services.exceptions.BusinessException;
 
 import static javax.ws.rs.core.MediaType.*;
-import org.guvnor.ala.services.api.itemlist.PipelineList;
+import org.guvnor.ala.pipeline.Input;
+import org.guvnor.ala.pipeline.PipelineConfig;
+import org.guvnor.ala.services.api.itemlist.PipelineConfigsList;
 
 @Path("pipelines")
 public interface PipelineService {
@@ -36,16 +37,16 @@ public interface PipelineService {
     @GET
     @Produces(value = APPLICATION_JSON)
     @Path("")
-    PipelineList getAllPipelines() throws BusinessException;
+    PipelineConfigsList getAllPipelineConfigs() throws BusinessException;
 
     @POST
     @Consumes(value = APPLICATION_JSON)
     @Path("")
-    String newPipeline( @NotNull Pipeline pipeline ) throws BusinessException;
+    String newPipeline(@NotNull PipelineConfig config ) throws BusinessException;
 
     @POST
     @Consumes(value = APPLICATION_JSON)
     @Path("{id}/run")
-    void runPipeline( @PathParam("id") String id ) throws BusinessException;
+    void runPipeline( @PathParam("id") String id, @NotNull Input input ) throws BusinessException;
 
 }

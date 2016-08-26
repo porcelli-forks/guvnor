@@ -17,85 +17,106 @@
 package org.guvnor.ala.services.rest;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
-import java.util.UUID;
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
+import org.guvnor.ala.config.Config;
 
 import org.guvnor.ala.pipeline.ConfigExecutor;
 import org.guvnor.ala.pipeline.Input;
 import org.guvnor.ala.pipeline.Pipeline;
+import org.guvnor.ala.pipeline.PipelineConfig;
+import org.guvnor.ala.pipeline.PipelineFactory;
 import org.guvnor.ala.pipeline.events.PipelineEventHandler;
 import org.guvnor.ala.pipeline.execution.PipelineExecutor;
 import org.guvnor.ala.registry.BuildRegistry;
 import org.guvnor.ala.registry.PipelineRegistry;
 import org.guvnor.ala.registry.SourceRegistry;
 import org.guvnor.ala.services.api.PipelineService;
-import org.guvnor.ala.services.api.itemlist.PipelineList;
+import org.guvnor.ala.services.api.itemlist.PipelineConfigsList;
 import org.guvnor.ala.services.exceptions.BusinessException;
-
-
 
 @ApplicationScoped
 public class RestPipelineServiceImpl implements PipelineService {
 
     @Inject
     private PipelineRegistry pipelineRegistry;
-    
+
     @Inject
     private SourceRegistry sourceRegistry;
-    
+
     @Inject
     private BuildRegistry buildRegistry;
-    
-//    @Inject
-//    private InMemoryRuntimeRegistry runtimeRegistry;
-//    
-//    @Inject
-//    private DockerAccessInterface dockerAccessInterface;
-    
+
+    @Inject
+    @Any
+    private Instance<ConfigExecutor> configExecutors;
+
+    @Inject
+    private PipelineExecutor executor;
+
     @Inject
     @Any
     private Instance<PipelineEventHandler> eventHandlers;
 
-
-    @Override
-    public PipelineList getAllPipelines() throws BusinessException {
-        return new PipelineList(pipelineRegistry.getAllPipelines());
+    @PostConstruct
+    public void init() {
+        Iterator<ConfigExecutor> iterator = configExecutors.iterator();
+        Collection<ConfigExecutor> configs = new ArrayList<>();
+        while ( iterator.hasNext() ) {
+            ConfigExecutor configExecutor = iterator.next();
+            configs.add( configExecutor );
+            System.out.println( ">Loaded configExecutor = " + configExecutor );
+        }
+        executor.init( configs );
     }
 
     @Override
-    public String newPipeline( Pipeline pipeline ) throws BusinessException {
-        String id = UUID.randomUUID().toString();
-//        pipeline.setName( id );
+    public PipelineConfigsList getAllPipelineConfigs() throws BusinessException {
+        List<PipelineConfig> configs = new ArrayList<>();
+        pipelineRegistry.getAllPipelines().stream().forEach( (p) -> {
+            configs.add( p.getConfig() );
+        } );
+        return new PipelineConfigsList( configs );
+    }
+
+    @Override
+    public String newPipeline( PipelineConfig config ) throws BusinessException {
+        System.out.println( "Name: " + config.getName() );
+        System.out.println( "Configs: " + config.getConfigStages() );
+        for ( Config c : config.getConfigStages() ) {
+            System.out.println( "Config: " + c );
+        }
+
+        final Pipeline pipeline = PipelineFactory.startFrom( null ).build( config );
+
         pipelineRegistry.registerPipeline( pipeline );
-        return pipeline.getName();
+
+        return config.getName();
     }
 
     @Override
-    public void runPipeline( final String name ) throws BusinessException {
-        
+    public void runPipeline( final String name,  final Input input) throws BusinessException {
+        System.out.println( ">>>  Name: " + name );
+        System.out.println( ">>> Input: " + input );
         Pipeline pipe = pipelineRegistry.getPipelineByName( name );
-        List<ConfigExecutor> configs = new ArrayList<>();
-        final PipelineExecutor executor = new PipelineExecutor(configs);
-        executor.execute( new Input() {
-            {
-                put( "repo-name", "drools-workshop" );
-                put( "branch", "master" );
-//                put( "out-dir", tempPath.getAbsolutePath() );
-                put( "origin", "https://github.com/salaboy/drools-workshop" );
-                put( "project-dir", "drools-webapp-example" );
-            }
-        }, pipe, (org.guvnor.ala.runtime.Runtime b) -> System.out.println( b ) );
-//        PipelineInstance newPipelineInstance = new PipelineInstanceImpl( pipelineRegistry.getPipelineByName( name ) );
-//
-//        for ( PipelineEventHandler peh : eventHandlers ) {
-//            newPipelineInstance.registerEventHandler( peh );
-//        }
-//        PipelineDataContext results = newPipelineInstance.execute();
+        
+        executor.execute( input, pipe, (org.guvnor.ala.runtime.Runtime b) -> System.out.println( b ) );
 
+        //new Input() {
+//            {
+//                put( "repo-name", "drools-workshop" );
+//                put( "branch", "master" );
+////                put( "out-dir", tempPath.getAbsolutePath() );
+//                put( "origin", "https://github.com/salaboy/drools-workshop" );
+//                put( "project-dir", "drools-webapp-example" );
+//            }
+//        }
     }
 
 }

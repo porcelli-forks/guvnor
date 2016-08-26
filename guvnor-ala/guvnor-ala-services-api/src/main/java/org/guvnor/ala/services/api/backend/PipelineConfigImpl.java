@@ -14,36 +14,46 @@
  * limitations under the License.
  */
 
-package org.guvnor.ala.docker.config.impl;
+package org.guvnor.ala.services.api.backend;
 
-import org.guvnor.ala.docker.config.DockerProviderConfig;
+import java.util.List;
+import org.guvnor.ala.config.Config;
+import org.guvnor.ala.pipeline.PipelineConfig;
 
-public class DockerProviderConfigImpl implements DockerProviderConfig {
+public class PipelineConfigImpl implements PipelineConfig {
 
     private String name;
-    private String hostIp;
+    private List<Config> configStages;
 
-    @Override
-    public String getHostIp() {
-        return ( hostIp != null ) ? hostIp : DockerProviderConfig.super.getHostIp();
+    public PipelineConfigImpl() {
+    }
+
+    public PipelineConfigImpl( String name, List<Config> configStages ) {
+        this.name = name;
+        this.configStages = configStages;
     }
 
     @Override
     public String getName() {
-        return ( name != null ) ? name : DockerProviderConfig.super.getName();
+        return name;
+    }
+
+    @Override
+    public List<Config> getConfigStages() {
+        return configStages;
     }
 
     public void setName( String name ) {
         this.name = name;
     }
 
-    public void setHostIp( String hostIp ) {
-        this.hostIp = hostIp;
+    public void setConfigStages( List<Config> configStages ) {
+        this.configStages = configStages;
     }
 
     @Override
     public String toString() {
-        return "DockerProviderConfigImpl{" + "name=" + name + ", hostIp=" + hostIp + '}';
+        return "PipelineConfigImpl{" + "configs=" + configStages + '}';
     }
 
 }

@@ -22,6 +22,7 @@ public class BasePipeline implements Pipeline {
 
     private String name;
     private List<Stage> stages;
+    private PipelineConfig config;
 
     public BasePipeline() {
     }
@@ -49,4 +50,13 @@ public class BasePipeline implements Pipeline {
         this.stages = stages;
     }
 
+    @Override
+    public PipelineConfig getConfig() {
+        return config;
+    }
+
+    public void setConfig( PipelineConfig config ) {
+        this.config = config;
+    }
+    
 }

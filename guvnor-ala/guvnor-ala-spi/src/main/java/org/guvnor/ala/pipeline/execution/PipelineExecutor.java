@@ -1,3 +1,4 @@
+
 package org.guvnor.ala.pipeline.execution;
 
 import java.util.Collection;
@@ -21,15 +22,22 @@ public class PipelineExecutor {
 
     private final Map<Class, ConfigExecutor> configExecutors = new HashMap<>();
 
-    public PipelineExecutor( final Collection<ConfigExecutor> configExecutors ) {
+    public PipelineExecutor() {
+    }
+
+    public void init( final Collection<ConfigExecutor> configExecutors ) {
         for ( final ConfigExecutor configExecutor : configExecutors ) {
             this.configExecutors.put( configExecutor.executeFor(), configExecutor );
         }
     }
 
+    public PipelineExecutor( final Collection<ConfigExecutor> configExecutors ) {
+        init( configExecutors );
+    }
+
     public <T> void execute( final Input input,
-                             final Pipeline pipeline,
-                             final Consumer<T> callback ) {
+            final Pipeline pipeline,
+            final Consumer<T> callback ) {
         final PipelineContext context = new PipelineContext( pipeline );
         context.start( input );
         context.pushCallback( callback );
@@ -45,21 +53,22 @@ public class PipelineExecutor {
                 stage.execute( newInput, output -> {
                     final ConfigExecutor executor = resolve( output.getClass() );
                     if ( output instanceof ContextAware ) {
-                        ( (ContextAware) output ).setContext( Collections.unmodifiableMap( context.getValues() ) );
+                        ( ( ContextAware ) output ).setContext( Collections.unmodifiableMap( context.getValues() ) );
                     }
                     final Object newOutput = interpolate( context.getValues(), output );
                     context.getValues().put( executor.inputId(), newOutput );
                     if ( executor instanceof BiFunctionConfigExecutor ) {
-                        final Optional result = (Optional) ( (BiFunctionConfigExecutor) executor ).apply( newInput, newOutput );
+                        final Optional result = ( Optional ) ( ( BiFunctionConfigExecutor ) executor ).apply( newInput, newOutput );
                         context.pushOutput( executor.outputId(), result.get() );
                     } else if ( executor instanceof FunctionConfigExecutor ) {
-                        final Optional result = (Optional) ( (FunctionConfigExecutor) executor ).apply( newOutput );
+                        final Optional result = ( Optional ) ( ( FunctionConfigExecutor ) executor ).apply( newOutput );
                         context.pushOutput( executor.outputId(), result.get() );
                     }
 
                     continuePipeline( context );
                 } );
             } catch ( final Throwable t ) {
+                t.printStackTrace();
                 throw new RuntimeException( "An error occurred while executing the " + ( stage == null ? "null" : stage.getName() ) + " stage.", t );
             }
             return;

@@ -18,12 +18,7 @@ package org.guvnor.ala.pipeline;
 
 import java.util.function.Consumer;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-import static com.fasterxml.jackson.annotation.JsonTypeInfo.As.*;
-import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.*;
-
-@JsonTypeInfo(use = CLASS, include = WRAPPER_OBJECT)
 public interface Stage<INPUT, OUTPUT> {
 
     void execute( final INPUT input,

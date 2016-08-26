@@ -20,40 +20,39 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import org.guvnor.ala.pipeline.Pipeline;
+import org.guvnor.ala.pipeline.PipelineConfig;
 import org.guvnor.ala.services.api.ItemList;
 
+public class PipelineConfigsList implements ItemList<PipelineConfig> {
 
-public class PipelineList implements ItemList<Pipeline> {
+    private PipelineConfig[] pipelineConfigs;
 
-    private Pipeline[] pipelines;
-
-    public PipelineList() {
+    public PipelineConfigsList() {
     }
 
-    public PipelineList( List<Pipeline> pipelines ) {
-        this.pipelines = pipelines.toArray( new Pipeline[pipelines.size()] );
+    public PipelineConfigsList( List<PipelineConfig> pipelineConfigs ) {
+        this.pipelineConfigs = pipelineConfigs.toArray( new PipelineConfig[pipelineConfigs.size()] );
     }
 
-    public PipelineList( Pipeline[] providers ) {
-        this.pipelines = providers;
+    public PipelineConfigsList( PipelineConfig[] pipelineConfigs ) {
+        this.pipelineConfigs = pipelineConfigs;
     }
 
-    public Pipeline[] getPipelines() {
-        return pipelines;
+    public PipelineConfig[] getPipelineConfigs() {
+        return pipelineConfigs;
     }
 
-    public void setPipelines( Pipeline[] pipelines ) {
-        this.pipelines = pipelines;
+    public void setPipelineConfigs( PipelineConfig[] pipelineConfigs ) {
+        this.pipelineConfigs = pipelineConfigs;
     }
 
     @Override
     @JsonIgnore
-    public List<Pipeline> getItems() {
-        if ( pipelines == null ) {
+    public List<PipelineConfig> getItems() {
+        if ( pipelineConfigs == null ) {
             return Collections.emptyList();
         }
-        return Arrays.asList( pipelines );
+        return Arrays.asList( pipelineConfigs );
     }
 
 }

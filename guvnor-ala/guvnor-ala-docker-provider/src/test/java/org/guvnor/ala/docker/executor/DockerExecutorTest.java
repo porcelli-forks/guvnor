@@ -78,8 +78,7 @@ public class DockerExecutorTest {
         final InMemoryRuntimeRegistry runtimeRegistry = new InMemoryRuntimeRegistry();
         final DockerAccessInterface dockerAccessInterface = new DockerAccessInterfaceImpl();
 
-        final Stage<Input, SourceConfig> sourceConfig = config( "Git Source", (s) -> new GitConfig() {
-        } );
+        final Stage<Input, SourceConfig> sourceConfig = config( "Git Source", (s) -> new GitConfig() {} );
         final Stage<SourceConfig, ProjectConfig> projectConfig = config( "Maven Project", (s) -> new MavenProjectConfig() {
         } );
         final Stage<ProjectConfig, BuildConfig> buildConfig = config( "Maven Build Config", (s) -> new MavenBuildConfig() {

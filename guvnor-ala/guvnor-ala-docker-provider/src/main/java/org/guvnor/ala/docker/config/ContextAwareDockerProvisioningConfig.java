@@ -1,5 +1,7 @@
+
 package org.guvnor.ala.docker.config;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Collection;
 import java.util.Map;
 
@@ -9,24 +11,28 @@ import org.guvnor.ala.pipeline.ContextAware;
 import org.guvnor.ala.runtime.providers.ProviderId;
 
 public class ContextAwareDockerProvisioningConfig implements
-                                                  ContextAware,
-                                                  DockerProvisioningConfig {
+        ContextAware,
+        DockerProvisioningConfig {
 
+    @JsonIgnore
     private Map<String, ?> context;
     private String imageName = "${input.image-name}";
     private String portNumber = "${input.port-number}";
+    private ProviderId providerId;
+    private String dockerPullValue = "${input.docker-pull}";
 
     @Override
+    @JsonIgnore
     public void setContext( final Map<String, ?> context ) {
         this.context = context;
-
+        this.providerId = ( ProviderId ) this.context.get( "docker-provider" );
         try {
             final Object _project = context.get( "project" );
             if ( _project != null && _project instanceof MavenProject ) {
-                final Collection<PlugIn> plugIns = ( (MavenProject) _project ).getBuildPlugins();
+                final Collection<PlugIn> plugIns = ( ( MavenProject ) _project ).getBuildPlugins();
                 for ( final PlugIn plugIn : plugIns ) {
                     if ( plugIn.getId().equals( "io.fabric8:docker-maven-plugin" ) ) {
-                        final Map<String, Object> _config = (Map<String, Object>) plugIn.getConfiguration().get( "images" );
+                        final Map<String, Object> _config = ( Map<String, Object> ) plugIn.getConfiguration().get( "images" );
                         imageName = getValue( _config, "image" ).get( "name" ).toString();
                         portNumber = getValue( getValue( getValue( _config, "image" ), "build" ), "ports" ).get( "port" ).toString();
                         break;
@@ -38,8 +44,8 @@ public class ContextAwareDockerProvisioningConfig implements
     }
 
     private Map<String, Object> getValue( final Map<String, Object> _config,
-                                          final String key ) {
-        return (Map<String, Object>) _config.get( key );
+            final String key ) {
+        return ( Map<String, Object> ) _config.get( key );
     }
 
     @Override
@@ -51,11 +57,36 @@ public class ContextAwareDockerProvisioningConfig implements
     public String getPortNumber() {
         return portNumber;
     }
-    
-    
 
     @Override
     public ProviderId getProviderId() {
-        return (ProviderId) context.get( "docker-provider" );
+        return providerId;
     }
+
+    public void setImageName( String imageName ) {
+        this.imageName = imageName;
+    }
+
+    public void setPortNumber( String portNumber ) {
+        this.portNumber = portNumber;
+    }
+
+    @Override
+    public String getDockerPullValue() {
+        return dockerPullValue;
+    }
+
+    public void setProviderId( ProviderId providerId ) {
+        this.providerId = providerId;
+    }
+
+    public void setDockerPullValue( String dockerPullValue ) {
+        this.dockerPullValue = dockerPullValue;
+    }
+
+    @Override
+    public String toString() {
+        return "ContextAwareDockerProvisioningConfig{" + "imageName=" + imageName + ", portNumber=" + portNumber + ", providerId=" + providerId + ", dockerPullValue=" + dockerPullValue + '}';
+    }
+
 }

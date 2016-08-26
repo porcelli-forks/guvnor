@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import javax.inject.Inject;
 
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -21,10 +22,12 @@ import org.guvnor.ala.pipeline.BiFunctionConfigExecutor;
 import org.guvnor.ala.registry.SourceRegistry;
 import org.guvnor.ala.source.Source;
 
+
 public class MavenProjectConfigExecutor implements BiFunctionConfigExecutor<Source, MavenProjectConfig, ProjectConfig> {
 
     private final SourceRegistry sourceRegistry;
-
+    
+    @Inject
     public MavenProjectConfigExecutor( final SourceRegistry sourceRegistry ) {
         this.sourceRegistry = sourceRegistry;
     }

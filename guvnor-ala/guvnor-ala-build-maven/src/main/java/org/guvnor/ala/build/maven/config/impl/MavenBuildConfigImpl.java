@@ -14,16 +14,27 @@
  * limitations under the License.
  */
 
-package org.guvnor.ala.pipeline;
+package org.guvnor.ala.build.maven.config.impl;
 
 import java.util.List;
+import org.guvnor.ala.build.maven.config.MavenBuildConfig;
 
-public interface Pipeline {
+public class MavenBuildConfigImpl implements MavenBuildConfig {
 
-    String getName();
+    private List<String> goals;
 
-    List<Stage> getStages();
-    
-    PipelineConfig getConfig();
+    @Override
+    public List<String> getGoals() {
+        return ( goals != null ) ? goals : MavenBuildConfig.super.getGoals();
+    }
+
+    public void setGoals( List<String> goals ) {
+        this.goals = goals;
+    }
+
+    @Override
+    public String toString() {
+        return "MavenBuildConfigImpl{" + "goals=" + goals + '}';
+    }
 
 }

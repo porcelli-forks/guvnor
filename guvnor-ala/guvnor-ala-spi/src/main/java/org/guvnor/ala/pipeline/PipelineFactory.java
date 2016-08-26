@@ -29,6 +29,16 @@ public final class PipelineFactory {
             public Pipeline buildAs( final String name ) {
                 return new BasePipeline(name, stages);
             }
+            
+            @Override
+            public Pipeline build( final PipelineConfig config ) {
+                stages.clear();
+                for ( final  Config c : config.getConfigStages() ) {
+                    stages.add( StageUtil.config( c.toString(), f -> c ) );
+                }
+                return new BasePipeline( config.getName(), stages );
+            }
+
         };
     }
 

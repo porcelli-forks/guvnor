@@ -1,7 +1,9 @@
 package org.guvnor.ala.wildfly.config;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import org.guvnor.ala.config.ProviderConfig;
 
+@JsonTypeName(value = "WildflyProviderConfig")
 public interface WildflyProviderConfig extends ProviderConfig {
 
     default String getName() {

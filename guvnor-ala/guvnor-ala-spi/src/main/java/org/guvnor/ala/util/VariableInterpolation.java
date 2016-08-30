@@ -5,7 +5,10 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver;
 import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.description.annotation.AnnotationDescription;
 import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
 import net.bytebuddy.implementation.InvocationHandlerAdapter;
 import net.bytebuddy.matcher.ElementMatchers;
@@ -13,6 +16,7 @@ import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.apache.commons.configuration.interpol.ConfigurationInterpolator;
 import org.apache.commons.lang.text.StrLookup;
 import org.apache.commons.lang.text.StrSubstitutor;
+import org.guvnor.ala.jackson.AlaTypeResolver;
 
 /**
  * TODO: update me
@@ -20,7 +24,6 @@ import org.apache.commons.lang.text.StrSubstitutor;
 public final class VariableInterpolation {
 
     private VariableInterpolation() {
-
     }
 
     private static final ConfigurationInterpolator interpolator = new ConfigurationInterpolator();
@@ -76,15 +79,24 @@ public final class VariableInterpolation {
                 _interfaces = instance.getClass().getInterfaces();
             }
 
-            return (T) new ByteBuddy()
+            final T result = (T) new ByteBuddy()
                     .subclass( Object.class )
                     .implement( _interfaces )
+                    .annotateType( AnnotationDescription.Builder.ofType( JsonTypeInfo.class )
+                                           .define( "use", JsonTypeInfo.Id.CUSTOM )
+                                           .define( "include", JsonTypeInfo.As.WRAPPER_OBJECT )
+                                           .build() )
+                    .annotateType( AnnotationDescription.Builder.ofType( JsonTypeIdResolver.class )
+                                           .define( "value", AlaTypeResolver.class )
+                                           .build() )
                     .method( ElementMatchers.any() )
                     .intercept( InvocationHandlerAdapter.of( new InterpolationHandler( instance ) ) )
                     .make()
                     .load( instance.getClass().getClassLoader(), ClassLoadingStrategy.Default.INJECTION )
                     .getLoaded()
                     .newInstance();
+
+            return result;
         } catch ( final Exception ignored ) {
             ignored.printStackTrace();
             return instance;

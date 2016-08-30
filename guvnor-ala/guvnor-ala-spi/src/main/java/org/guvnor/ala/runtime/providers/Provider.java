@@ -27,7 +27,6 @@ import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.*;
  * runtimes. Such as: Docker, Kubernetes, Application Servers (Wildfly, Tomcat,
  * etc)
  */
-@JsonTypeInfo(use = CLASS, include = WRAPPER_OBJECT)
 public interface Provider extends ProviderId {
 
     ProviderConfig getConfig();

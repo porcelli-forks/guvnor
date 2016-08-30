@@ -16,12 +16,14 @@
 
 package org.guvnor.ala.wildfly.config;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import org.guvnor.ala.config.ProvisioningConfig;
 import org.guvnor.ala.config.RuntimeConfig;
 
-
+@JsonTypeName(value = "WildflyRuntimeConfiguration")
 public interface WildflyRuntimeConfiguration extends ProvisioningConfig,
-                                                    RuntimeConfig {
+                                                     RuntimeConfig {
+
     String getWarPath();
 
 }

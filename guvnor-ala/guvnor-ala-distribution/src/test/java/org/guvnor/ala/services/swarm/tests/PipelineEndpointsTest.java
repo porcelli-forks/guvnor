@@ -41,11 +41,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.wildfly.swarm.jaxrs.JAXRSArchive;
 
 @RunWith( Arquillian.class )
+@Ignore
 public class PipelineEndpointsTest {
 
     private final String APP_URL = "http://localhost:8080/";

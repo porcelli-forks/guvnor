@@ -23,8 +23,8 @@ import org.guvnor.ala.runtime.providers.ProviderId;
 public class WildflyRuntime extends BaseRuntime {
 
     public WildflyRuntime( final String id,
-                          final RuntimeConfig config,
-                          final ProviderId providerId ) {
+                           final RuntimeConfig config,
+                           final ProviderId providerId ) {
         super( id, config, providerId );
         this.endpoint = new WildflyRuntimeEndpoint();
         this.info = new WildflyRuntimeInfo();
@@ -35,4 +35,10 @@ public class WildflyRuntime extends BaseRuntime {
     public String toString() {
         return "WildflyRuntime{" + getId() + " }";
     }
+
+    @Override
+    public String getType() {
+        return WildflyRuntime.class.getName();
+    }
+
 }

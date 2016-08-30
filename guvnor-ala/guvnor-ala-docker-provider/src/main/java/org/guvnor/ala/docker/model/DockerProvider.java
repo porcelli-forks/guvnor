@@ -15,9 +15,11 @@
  */
 package org.guvnor.ala.docker.model;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import org.guvnor.ala.config.ProviderConfig;
 import org.guvnor.ala.runtime.providers.base.BaseProvider;
 
+@JsonTypeName( value = "DockerProvider")
 public class DockerProvider extends BaseProvider implements ProviderConfig {
 
     private String hostId;

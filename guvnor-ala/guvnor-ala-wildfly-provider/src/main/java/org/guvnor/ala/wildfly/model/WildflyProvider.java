@@ -5,9 +5,11 @@
  */
 package org.guvnor.ala.wildfly.model;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import org.guvnor.ala.config.ProviderConfig;
 import org.guvnor.ala.runtime.providers.base.BaseProvider;
 
+@JsonTypeName( value = "WildflyProvider")
 public class WildflyProvider extends BaseProvider implements ProviderConfig {
 
     private final String hostId;

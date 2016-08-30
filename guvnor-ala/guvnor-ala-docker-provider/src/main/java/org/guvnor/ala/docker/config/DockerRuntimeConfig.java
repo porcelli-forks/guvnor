@@ -16,11 +16,14 @@
 
 package org.guvnor.ala.docker.config;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import org.guvnor.ala.config.ProvisioningConfig;
 import org.guvnor.ala.config.RuntimeConfig;
 
+@JsonTypeName( value = "DockerRuntimeConfig")
 public interface DockerRuntimeConfig extends ProvisioningConfig,
-                                                    RuntimeConfig {
+                                             RuntimeConfig {
+
     String getImage();
 
     String getPort();

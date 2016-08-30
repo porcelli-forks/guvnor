@@ -1,9 +1,9 @@
 package org.guvnor.ala.docker.config;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import org.guvnor.ala.config.ProviderConfig;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.WRAPPER_OBJECT)
+@JsonTypeName(value = "DockerProviderConfig")
 public interface DockerProviderConfig extends ProviderConfig {
 
     default String getName() {

@@ -17,19 +17,20 @@
 package org.guvnor.ala.runtime;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver;
 import org.guvnor.ala.config.RuntimeConfig;
-
-import static com.fasterxml.jackson.annotation.JsonTypeInfo.As.*;
-import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.*;
+import org.guvnor.ala.jackson.AlaTypeResolver;
 
 /**
- *         <p>
- *         This class represent a Runtime (Docker Image running or a WAR deployed into a
- *         server)
- *         It also allows you to interact with the runtime state executing operations
- *         such as start, stop, restart
+ * <p>
+ * This class represent a Runtime (Docker Image running or a WAR deployed into a
+ * server)
+ * It also allows you to interact with the runtime state executing operations
+ * such as start, stop, restart
  */
-@JsonTypeInfo(use = CLASS, include = WRAPPER_OBJECT)
+@JsonTypeInfo(use = JsonTypeInfo.Id.CUSTOM,
+        include = JsonTypeInfo.As.WRAPPER_OBJECT)
+@JsonTypeIdResolver(AlaTypeResolver.class)
 public interface Runtime extends RuntimeId {
 
     void setId( String id );
@@ -50,4 +51,7 @@ public interface Runtime extends RuntimeId {
 
     RuntimeInfo getInfo();
 
+    String getType();
+
+    void setType( String value );
 }

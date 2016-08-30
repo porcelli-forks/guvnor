@@ -34,7 +34,7 @@ public abstract class BaseRuntime implements Runtime {
 
     public BaseRuntime() {
     }
-    
+
     public BaseRuntime( final String id,
                         final RuntimeConfig config,
                         final ProviderId providerId ) {
@@ -103,5 +103,8 @@ public abstract class BaseRuntime implements Runtime {
         return "Runtime{" + "id=" + id + ", config=" + config + ", info=" + info + ", state=" + state + ", endpoint=" + endpoint + ", providerId=" + providerId + '}';
     }
 
-    
+    @Override
+    public void setType( final String value ) {
+        //ignore
+    }
 }

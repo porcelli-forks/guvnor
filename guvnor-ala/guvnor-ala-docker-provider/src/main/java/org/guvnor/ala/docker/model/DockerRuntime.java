@@ -34,6 +34,8 @@ public class DockerRuntime extends BaseRuntime {
         this.state = new DockerRuntimeState();
     }
 
-    
-    
+    @Override
+    public String getType() {
+        return DockerRuntime.class.getName();
+    }
 }

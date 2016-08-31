@@ -46,7 +46,7 @@ import org.guvnor.ala.wildfly.access.WildflyAccessInterface;
 import org.guvnor.ala.wildfly.access.impl.WildflyAccessInterfaceImpl;
 import org.guvnor.ala.wildfly.config.ContextAwareWildflyRuntimeExecConfig;
 import org.guvnor.ala.wildfly.config.WildflyProviderConfig;
-import org.guvnor.ala.wildfly.config.WildflyProviderConfigExecutor;
+import org.guvnor.ala.wildfly.executor.WildflyProviderConfigExecutor;
 import org.guvnor.ala.wildfly.executor.WildflyRuntimeExecExecutor;
 import org.guvnor.ala.wildfly.model.WildflyRuntime;
 import org.guvnor.ala.wildfly.service.WildflyRuntimeManager;

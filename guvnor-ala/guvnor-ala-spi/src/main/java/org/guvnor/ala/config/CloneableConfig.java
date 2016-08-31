@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2016 JBoss, by Red Hat, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package org.guvnor.ala.wildfly.config;
+package org.guvnor.ala.config;
 
-import org.guvnor.ala.config.ProvisioningConfig;
-import org.guvnor.ala.config.RuntimeConfig;
+/**
+ * TODO: update me
+ */
+public interface CloneableConfig<T> {
 
-public interface WildflyRuntimeConfiguration extends ProvisioningConfig,
-                                                     RuntimeConfig {
-
-    String getWarPath();
-
+    T asNewClone( T origin );
 }

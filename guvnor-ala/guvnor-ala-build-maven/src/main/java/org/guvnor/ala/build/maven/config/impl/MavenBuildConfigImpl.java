@@ -16,16 +16,28 @@
 
 package org.guvnor.ala.build.maven.config.impl;
 
+import java.util.ArrayList;
 import java.util.List;
-import org.guvnor.ala.build.maven.config.MavenBuildConfig;
 
-public class MavenBuildConfigImpl implements MavenBuildConfig {
+import org.guvnor.ala.build.maven.config.MavenBuildConfig;
+import org.guvnor.ala.config.CloneableConfig;
+
+public class MavenBuildConfigImpl implements MavenBuildConfig,
+                                             CloneableConfig<MavenBuildConfig> {
 
     private List<String> goals;
 
+    public MavenBuildConfigImpl() {
+        goals = new ArrayList<>( MavenBuildConfig.super.getGoals() );
+    }
+
+    public MavenBuildConfigImpl( final List<String> goals ) {
+        this.goals = new ArrayList<>( goals );
+    }
+
     @Override
     public List<String> getGoals() {
-        return ( goals != null ) ? goals : MavenBuildConfig.super.getGoals();
+        return goals;
     }
 
     public void setGoals( List<String> goals ) {
@@ -37,4 +49,8 @@ public class MavenBuildConfigImpl implements MavenBuildConfig {
         return "MavenBuildConfigImpl{" + "goals=" + goals + '}';
     }
 
+    @Override
+    public MavenBuildConfig asNewClone( final MavenBuildConfig source ) {
+        return new MavenBuildConfigImpl( source.getGoals() );
+    }
 }

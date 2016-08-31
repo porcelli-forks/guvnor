@@ -7,6 +7,7 @@ import org.guvnor.ala.config.Config;
 import org.guvnor.ala.config.ProviderConfig;
 import org.guvnor.ala.docker.config.DockerProviderConfig;
 import org.guvnor.ala.docker.model.DockerProvider;
+import org.guvnor.ala.docker.model.DockerProviderImpl;
 import org.guvnor.ala.pipeline.FunctionConfigExecutor;
 import org.guvnor.ala.registry.RuntimeRegistry;
 import org.guvnor.ala.runtime.providers.ProviderBuilder;
@@ -26,7 +27,7 @@ public class DockerProviderConfigExecutor implements ProviderBuilder<DockerProvi
 
     @Override
     public Optional<DockerProvider> apply( final DockerProviderConfig dockerProviderConfig ) {
-        final DockerProvider provider = new DockerProvider( dockerProviderConfig.getName(), dockerProviderConfig.getHostIp() );
+        final DockerProviderImpl provider = new DockerProviderImpl( dockerProviderConfig.getName(), dockerProviderConfig.getHostIp() );
         provider.setConfig( dockerProviderConfig );
         runtimeRegistry.registerProvider( provider );
         return Optional.of( provider );

@@ -13,6 +13,7 @@ import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.apache.commons.configuration.interpol.ConfigurationInterpolator;
 import org.apache.commons.lang.text.StrLookup;
 import org.apache.commons.lang.text.StrSubstitutor;
+import org.guvnor.ala.config.CloneableConfig;
 
 /**
  * TODO: update me
@@ -76,7 +77,7 @@ public final class VariableInterpolation {
                 _interfaces = instance.getClass().getInterfaces();
             }
 
-            return (T) new ByteBuddy()
+            T result = (T) new ByteBuddy()
                     .subclass( Object.class )
                     .implement( _interfaces )
                     .method( ElementMatchers.any() )
@@ -85,6 +86,10 @@ public final class VariableInterpolation {
                     .load( instance.getClass().getClassLoader(), ClassLoadingStrategy.Default.INJECTION )
                     .getLoaded()
                     .newInstance();
+            if ( instance instanceof CloneableConfig ) {
+                return (T) ( (CloneableConfig) result ).asNewClone( result );
+            }
+            return result;
         } catch ( final Exception ignored ) {
             ignored.printStackTrace();
             return instance;

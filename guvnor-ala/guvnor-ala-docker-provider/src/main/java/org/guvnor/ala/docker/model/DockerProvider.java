@@ -16,28 +16,11 @@
 package org.guvnor.ala.docker.model;
 
 import org.guvnor.ala.config.ProviderConfig;
-import org.guvnor.ala.runtime.providers.base.BaseProvider;
+import org.guvnor.ala.runtime.providers.Provider;
 
-public class DockerProvider extends BaseProvider implements ProviderConfig {
+public interface DockerProvider extends ProviderConfig,
+                                        Provider {
 
-    private String hostId;
+    String getHostId();
 
-    public DockerProvider() {
-    }
-
-    
-    public DockerProvider( final String name,
-                           final String hostId ) {
-        super( name, DockerProviderType.instance() );
-        this.hostId = hostId;
-    }
-
-    public String getHostId() {
-        return hostId;
-    }
-
-    public void setHostId( String hostId ) {
-        this.hostId = hostId;
-    }
-    
 }

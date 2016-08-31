@@ -22,6 +22,7 @@ public final class StageUtil {
             @Override
             public void execute( final INPUT input,
                                  final Consumer<OUTPUT> callback ) {
+                System.out.println( print( input.getClass().getInterfaces() ) );
                 callback.accept( f.apply( input ) );
             }
 
@@ -30,6 +31,14 @@ public final class StageUtil {
                 return name;
             }
         };
+    }
+
+    private static String print( final Class<?>[] interfaces ) {
+        final StringBuilder sb = new StringBuilder();
+        for ( Class<?> i : interfaces ) {
+            sb.append( i.getName() ).append( "; " );
+        }
+        return sb.append( "\n" ).toString();
     }
 
     public static <OUTPUT extends Config> Stage<?, OUTPUT> config( final String name,

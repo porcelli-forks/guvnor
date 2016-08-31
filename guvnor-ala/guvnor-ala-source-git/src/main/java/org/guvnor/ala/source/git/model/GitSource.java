@@ -16,11 +16,13 @@
 
 package org.guvnor.ala.source.git.model;
 
-import org.uberfire.java.nio.file.Path;
+import org.guvnor.ala.config.CloneableConfig;
 import org.guvnor.ala.source.Source;
 import org.guvnor.ala.source.git.GitRepository;
+import org.uberfire.java.nio.file.Path;
 
-public class GitSource implements Source {
+public class GitSource implements Source,
+                                  CloneableConfig<GitSource> {
 
     private final GitRepository repository;
     private final Path path;
@@ -35,4 +37,14 @@ public class GitSource implements Source {
     public Path getPath() {
         return path;
     }
+
+    public GitRepository getRepository() {
+        return repository;
+    }
+
+    @Override
+    public GitSource asNewClone( final GitSource source ) {
+        return new GitSource( source.getRepository(), source.getPath() );
+    }
+
 }

@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import org.guvnor.ala.build.Project;
 import org.guvnor.ala.build.maven.config.MavenBuildConfig;
-import org.guvnor.ala.build.maven.model.MavenBuild;
+import org.guvnor.ala.build.maven.model.impl.MavenBuildImpl;
 import org.guvnor.ala.config.BuildConfig;
 import org.guvnor.ala.config.Config;
 import org.guvnor.ala.pipeline.BiFunctionConfigExecutor;
@@ -14,7 +14,7 @@ public class MavenBuildConfigExecutor implements BiFunctionConfigExecutor<Projec
     @Override
     public Optional<BuildConfig> apply( final Project project,
                                         final MavenBuildConfig mavenBuildConfig ) {
-        return Optional.of( new MavenBuild( project, mavenBuildConfig.getGoals() ) );
+        return Optional.of( new MavenBuildImpl( project, mavenBuildConfig.getGoals() ) );
     }
 
     @Override

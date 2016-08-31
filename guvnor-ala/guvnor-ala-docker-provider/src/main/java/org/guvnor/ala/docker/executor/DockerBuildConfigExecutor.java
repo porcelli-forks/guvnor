@@ -8,7 +8,7 @@ import org.guvnor.ala.build.maven.model.MavenBuild;
 import org.guvnor.ala.config.BuildConfig;
 import org.guvnor.ala.config.Config;
 import org.guvnor.ala.docker.config.DockerBuildConfig;
-import org.guvnor.ala.docker.model.DockerBuild;
+import org.guvnor.ala.docker.model.DockerBuildImpl;
 import org.guvnor.ala.pipeline.BiFunctionConfigExecutor;
 
 public class DockerBuildConfigExecutor implements BiFunctionConfigExecutor<MavenBuild, DockerBuildConfig, BuildConfig> {
@@ -25,7 +25,7 @@ public class DockerBuildConfigExecutor implements BiFunctionConfigExecutor<Maven
         if ( dockerBuildConfig.push() ) {
             goals.add( "docker:push" );
         }
-        return Optional.of( new DockerBuild( buildConfig.getProject(), goals ) );
+        return Optional.of( new DockerBuildImpl( buildConfig.getProject(), goals ) );
     }
 
     @Override

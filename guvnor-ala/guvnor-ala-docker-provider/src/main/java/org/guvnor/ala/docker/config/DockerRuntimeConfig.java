@@ -20,7 +20,8 @@ import org.guvnor.ala.config.ProvisioningConfig;
 import org.guvnor.ala.config.RuntimeConfig;
 
 public interface DockerRuntimeConfig extends ProvisioningConfig,
-                                                    RuntimeConfig {
+                                             RuntimeConfig {
+
     String getImage();
 
     String getPort();

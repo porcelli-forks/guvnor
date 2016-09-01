@@ -28,8 +28,8 @@ public class BaseRuntimeEndpoint implements RuntimeEndpoint {
     }
 
     public BaseRuntimeEndpoint( String host,
-                                int port,
-                                String context ) {
+            int port,
+            String context ) {
         this.host = host;
         this.port = port;
         this.context = context;
@@ -60,6 +60,11 @@ public class BaseRuntimeEndpoint implements RuntimeEndpoint {
 
     public void setContext( String context ) {
         this.context = context;
+    }
+
+    @Override
+    public String toString() {
+        return "RuntimeEndpoint{" + "host=" + host + ", port=" + port + ", context=" + context + '}';
     }
 
 }

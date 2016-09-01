@@ -29,8 +29,8 @@ public class BaseRuntimeInfo implements RuntimeInfo {
     }
 
     public BaseRuntimeInfo( String id,
-                            String name,
-                            RuntimeConfig config ) {
+            String name,
+            RuntimeConfig config ) {
         this.id = id;
         this.name = name;
         this.config = config;
@@ -50,4 +50,10 @@ public class BaseRuntimeInfo implements RuntimeInfo {
     public RuntimeConfig getConfig() {
         return config;
     }
+
+    @Override
+    public String toString() {
+        return "RuntimeInfo{" + "id=" + id + ", name=" + name + ", config=" + config + '}';
+    }
+
 }

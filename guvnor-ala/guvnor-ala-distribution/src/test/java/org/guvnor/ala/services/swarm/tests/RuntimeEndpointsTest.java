@@ -85,7 +85,7 @@ public class RuntimeEndpointsTest {
 
         assertTrue( runtime instanceof DockerRuntime );
         DockerRuntime dockerRuntime = ( DockerRuntime ) runtime;
-        System.out.println( " Docker Runtime 1: " +  dockerRuntime);
+        
         assertEquals( "Running", dockerRuntime.getState().getStatus());
         proxy.stopRuntime( newRuntime );
 
@@ -95,7 +95,7 @@ public class RuntimeEndpointsTest {
 
         assertTrue( runtime instanceof DockerRuntime );
         dockerRuntime = ( DockerRuntime ) runtime;
-        System.out.println( " Docker Runtime 2: " +  dockerRuntime);
+        
         
         assertEquals( "Stopped", dockerRuntime.getState().getStatus());
         

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Red Hat, Inc. and/or its affiliates.
+ * Copyright 2016 JBoss, by Red Hat, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,28 @@
  * limitations under the License.
  */
 
-package org.guvnor.ala.build.maven.model;
+package org.guvnor.ala.docker.model;
 
 import java.util.List;
 
 import org.guvnor.ala.build.Project;
-import org.guvnor.ala.config.BuildConfig;
+import org.guvnor.ala.build.maven.model.MavenBuild;
+import org.guvnor.ala.build.maven.model.impl.MavenBuildImpl;
 
 /**
- * The Build services implementation using Maven Invoker
+ * TODO: update me
  */
-public interface MavenBuild extends BuildConfig {
+public class DockerBuildImpl extends MavenBuildImpl
+        implements DockerBuild {
 
-  
-    Project getProject();
+    public DockerBuildImpl( final Project project,
+                            final List<String> goals ) {
+        super( project, goals );
+    }
 
-    List<String> getGoals();
+    @Override
+    public MavenBuild asNewClone( final MavenBuild source ) {
+        return new DockerBuildImpl( getProject(), getGoals() );
+    }
+
 }

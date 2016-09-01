@@ -19,11 +19,8 @@ package org.guvnor.ala.docker.service;
 import com.spotify.docker.client.DockerException;
 import com.spotify.docker.client.messages.ContainerInfo;
 import com.spotify.docker.client.messages.ContainerState;
-import static java.util.logging.Level.SEVERE;
-import static java.util.logging.Logger.getLogger;
 import javax.inject.Inject;
 import org.guvnor.ala.docker.access.DockerAccessInterface;
-import org.guvnor.ala.docker.model.DockerProvider;
 import org.guvnor.ala.docker.model.DockerRuntime;
 import org.guvnor.ala.docker.model.DockerRuntimeState;
 import org.guvnor.ala.registry.RuntimeRegistry;
@@ -55,10 +52,11 @@ public class DockerRuntimeManager implements RuntimeManager {
     public void start( RuntimeId runtimeId ) {
         DockerRuntime runtime = ( DockerRuntime ) runtimeRegistry.getRuntimeById( runtimeId.getId() );
         try {
+            LOG.info( "Starting container: " + runtimeId.getId() );
             docker.getDockerClient( runtime.getProviderId() ).startContainer( runtime.getId() );
             refresh( runtimeId );
         } catch ( DockerException | InterruptedException ex ) {
-            getLogger( DockerProvider.class.getName() ).log( SEVERE, null, ex );
+            LOG.error( "Error Starting container: " + runtimeId.getId(), ex );
         }
     }
 
@@ -66,10 +64,11 @@ public class DockerRuntimeManager implements RuntimeManager {
     public void stop( RuntimeId runtimeId ) {
         DockerRuntime runtime = ( DockerRuntime ) runtimeRegistry.getRuntimeById( runtimeId.getId() );
         try {
-            docker.getDockerClient( runtime.getProviderId() ).stopContainer( runtime.getId(), 0 );
+            LOG.info( "Stopping container: " + runtimeId.getId() );
+            docker.getDockerClient( runtime.getProviderId() ).stopContainer( runtime.getId(), 1 );
             refresh( runtimeId );
         } catch ( DockerException | InterruptedException ex ) {
-            getLogger( DockerProvider.class.getName() ).log( SEVERE, null, ex );
+            LOG.error( "Error Stopping container: " + runtimeId.getId(), ex );
         }
     }
 
@@ -80,7 +79,7 @@ public class DockerRuntimeManager implements RuntimeManager {
             docker.getDockerClient( runtime.getProviderId() ).restartContainer( runtime.getId() );
             refresh( runtimeId );
         } catch ( DockerException | InterruptedException ex ) {
-            getLogger( DockerProvider.class.getName() ).log( SEVERE, null, ex );
+            LOG.error( "Error Restarting container: " + runtimeId.getId(), ex );
         }
     }
 
@@ -102,7 +101,7 @@ public class DockerRuntimeManager implements RuntimeManager {
             }
             runtime.setState( new DockerRuntimeState( stateString, state.startedAt().toString() ) );
         } catch ( DockerException | InterruptedException ex ) {
-            getLogger( DockerRuntime.class.getName() ).log( SEVERE, null, ex );
+            LOG.error( "Error Refreshing container: " + runtimeId.getId(), ex );
         }
     }
 
@@ -113,7 +112,7 @@ public class DockerRuntimeManager implements RuntimeManager {
             docker.getDockerClient( runtime.getProviderId() ).pauseContainer( runtime.getId() );
             refresh( runtimeId );
         } catch ( DockerException | InterruptedException ex ) {
-            getLogger( DockerProvider.class.getName() ).log( SEVERE, null, ex );
+            LOG.error( "Error Pausing container: " + runtimeId.getId(), ex );
         }
     }
 

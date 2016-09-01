@@ -42,4 +42,11 @@ public class BaseRuntimeState implements RuntimeState {
         return startedAt;
     }
 
+    @Override
+    public String toString() {
+        return "RuntimeState{" + "status=" + status + ", startedAt=" + startedAt + '}';
+    }
+    
+    
+
 }

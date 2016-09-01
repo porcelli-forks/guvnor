@@ -156,7 +156,7 @@ public class InMemoryRuntimeRegistry implements RuntimeRegistry {
 
         final Provider value = providers.get( providerId.getId() );
         if ( value == null ||
-                !value.getClass().isAssignableFrom( clazz ) ) {
+                !clazz.isAssignableFrom( value.getClass() ) ) {
             return Optional.empty();
         }
         return Optional.of( clazz.cast( value ) );
@@ -165,7 +165,6 @@ public class InMemoryRuntimeRegistry implements RuntimeRegistry {
     @Override
     public void unregisterRuntime( final RuntimeId runtime ) {
         final Provider provider = providers.get( runtime.getProviderId().getId() );
-
         runtimesByProviderType.get( provider.getProviderType() ).remove( runtime );
     }
 

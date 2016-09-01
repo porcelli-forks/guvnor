@@ -25,7 +25,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
-import org.guvnor.ala.config.Config;
 
 import org.guvnor.ala.pipeline.ConfigExecutor;
 import org.guvnor.ala.pipeline.Input;
@@ -71,7 +70,6 @@ public class RestPipelineServiceImpl implements PipelineService {
         while ( iterator.hasNext() ) {
             ConfigExecutor configExecutor = iterator.next();
             configs.add( configExecutor );
-            System.out.println( ">Loaded configExecutor = " + configExecutor );
         }
         executor.init( configs );
     }
@@ -87,36 +85,16 @@ public class RestPipelineServiceImpl implements PipelineService {
 
     @Override
     public String newPipeline( PipelineConfig config ) throws BusinessException {
-        System.out.println( "Name: " + config.getName() );
-        System.out.println( "Configs: " + config.getConfigStages() );
-        for ( Config c : config.getConfigStages() ) {
-            System.out.println( "Config: " + c );
-        }
-
         final Pipeline pipeline = PipelineFactory.startFrom( null ).build( config );
-
         pipelineRegistry.registerPipeline( pipeline );
-
         return config.getName();
     }
 
     @Override
     public void runPipeline( final String name,  final Input input) throws BusinessException {
-        System.out.println( ">>>  Name: " + name );
-        System.out.println( ">>> Input: " + input );
         Pipeline pipe = pipelineRegistry.getPipelineByName( name );
-        
         executor.execute( input, pipe, (org.guvnor.ala.runtime.Runtime b) -> System.out.println( b ) );
 
-        //new Input() {
-//            {
-//                put( "repo-name", "drools-workshop" );
-//                put( "branch", "master" );
-////                put( "out-dir", tempPath.getAbsolutePath() );
-//                put( "origin", "https://github.com/salaboy/drools-workshop" );
-//                put( "project-dir", "drools-webapp-example" );
-//            }
-//        }
     }
 
 }

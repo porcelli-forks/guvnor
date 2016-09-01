@@ -16,10 +16,12 @@
 
 package org.guvnor.ala.docker.config.impl;
 
+import org.guvnor.ala.config.CloneableConfig;
 import org.guvnor.ala.docker.config.DockerRuntimeConfig;
 import org.guvnor.ala.runtime.providers.ProviderId;
 
-public class DockerRuntimeConfigImpl implements DockerRuntimeConfig {
+public class DockerRuntimeConfigImpl implements DockerRuntimeConfig,
+                                                CloneableConfig<DockerRuntimeConfig> {
 
     private String image;
     private String port;
@@ -29,7 +31,10 @@ public class DockerRuntimeConfigImpl implements DockerRuntimeConfig {
     public DockerRuntimeConfigImpl() {
     }
 
-    public DockerRuntimeConfigImpl( ProviderId providerId, String image, String port, boolean pull ) {
+    public DockerRuntimeConfigImpl( ProviderId providerId,
+                                    String image,
+                                    String port,
+                                    boolean pull ) {
         this.providerId = providerId;
         this.image = image;
         this.port = port;
@@ -78,4 +83,11 @@ public class DockerRuntimeConfigImpl implements DockerRuntimeConfig {
         return "DockerRuntimeConfigImpl{" + "image=" + image + ", port=" + port + ", pull=" + pull + ", providerId=" + providerId + '}';
     }
 
+    @Override
+    public DockerRuntimeConfig asNewClone( final DockerRuntimeConfig source ) {
+        return new DockerRuntimeConfigImpl( source.getProviderId(),
+                                            source.getImage(),
+                                            source.getPort(),
+                                            source.isPull() );
+    }
 }

@@ -16,35 +16,55 @@
 
 package org.guvnor.ala.docker.config.impl;
 
+import org.guvnor.ala.config.CloneableConfig;
 import org.guvnor.ala.docker.config.DockerBuildConfig;
 
-public class DockerBuildConfigImpl implements DockerBuildConfig {
+public class DockerBuildConfigImpl implements DockerBuildConfig,
+                                              CloneableConfig<DockerBuildConfig> {
 
     private String username;
     private String password;
     private Boolean push;
 
+    public DockerBuildConfigImpl() {
+        this.username = DockerBuildConfig.super.getUsername();
+        this.password = DockerBuildConfig.super.getPassword();
+        this.push = DockerBuildConfig.super.push();
+    }
+
+    public DockerBuildConfigImpl( final String username,
+                                  final String password,
+                                  final Boolean push ) {
+        this.username = username;
+        this.password = password;
+        this.push = push;
+    }
+
     @Override
     public boolean push() {
-        return ( push != null ) ? push : DockerBuildConfig.super.push();
+        return push;
 
     }
 
     @Override
     public String getPassword() {
-        return ( password != null ) ? password : DockerBuildConfig.super.getPassword();
+        return password;
     }
 
     @Override
     public String getUsername() {
-        return ( username != null ) ? username : DockerBuildConfig.super.getUsername();
+        return username;
     }
 
     @Override
     public String toString() {
         return "DockerBuildConfigImpl{" + "username=" + username + ", password=" + password + ", push=" + push + '}';
     }
-    
-    
 
+    @Override
+    public DockerBuildConfig asNewClone( final DockerBuildConfig source ) {
+        return new DockerBuildConfigImpl( source.getUsername(),
+                                          source.getPassword(),
+                                          source.push() );
+    }
 }

@@ -11,6 +11,7 @@ import org.guvnor.ala.build.Project;
 import org.guvnor.ala.build.maven.config.MavenBuildExecConfig;
 import org.guvnor.ala.build.maven.model.MavenBinary;
 import org.guvnor.ala.build.maven.model.MavenBuild;
+import org.guvnor.ala.build.maven.model.impl.MavenBinaryImpl;
 import org.guvnor.ala.build.maven.util.RepositoryVisitor;
 import org.guvnor.ala.config.BinaryConfig;
 import org.guvnor.ala.config.Config;
@@ -35,7 +36,7 @@ public class MavenBuildExecConfigExecutor implements BiFunctionConfigExecutor<Ma
             throw new RuntimeException("Cannot build Maven Project. Look at the previous logs for more information.");
             
         }
-        final MavenBinary binary = new MavenBinary( mavenBuild.getProject() );
+        final MavenBinary binary = new MavenBinaryImpl( mavenBuild.getProject() );
         buildRegistry.registerBinary( binary );
         return Optional.of( binary );
     }

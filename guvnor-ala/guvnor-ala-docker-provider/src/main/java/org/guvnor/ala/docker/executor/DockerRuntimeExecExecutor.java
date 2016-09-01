@@ -1,3 +1,4 @@
+
 package org.guvnor.ala.docker.executor;
 
 import java.util.ArrayList;
@@ -30,8 +31,8 @@ import org.slf4j.LoggerFactory;
 import org.guvnor.ala.docker.config.DockerRuntimeConfig;
 
 public class DockerRuntimeExecExecutor<T extends DockerRuntimeConfig> implements RuntimeBuilder<T, DockerRuntime>,
-                                                                                        RuntimeDestroyer,
-                                                                                        FunctionConfigExecutor<T, DockerRuntime> {
+        RuntimeDestroyer,
+        FunctionConfigExecutor<T, DockerRuntime> {
 
     private final RuntimeRegistry runtimeRegistry;
     private final DockerAccessInterface docker;
@@ -39,7 +40,7 @@ public class DockerRuntimeExecExecutor<T extends DockerRuntimeConfig> implements
 
     @Inject
     public DockerRuntimeExecExecutor( final RuntimeRegistry runtimeRegistry,
-                                      final DockerAccessInterface docker ) {
+            final DockerAccessInterface docker ) {
         this.runtimeRegistry = runtimeRegistry;
         this.docker = docker;
     }
@@ -56,10 +57,10 @@ public class DockerRuntimeExecExecutor<T extends DockerRuntimeConfig> implements
     private Optional<DockerRuntime> create( final DockerRuntimeConfig runtimeConfig ) throws ProvisioningException {
         if ( runtimeConfig.isPull() ) {
             try {
-                LOG.info( "Pulling Docker Image: " + runtimeConfig.getImage());
+                LOG.info( "Pulling Docker Image: " + runtimeConfig.getImage() );
                 docker.getDockerClient( runtimeConfig.getProviderId() ).pull( runtimeConfig.getImage() );
             } catch ( DockerException | InterruptedException ex ) {
-                LOG.error( ex.getMessage() , ex);
+                LOG.error( ex.getMessage(), ex );
                 throw new ProvisioningException( "Error Pulling Docker Image: " + runtimeConfig.getImage() + "with error: " + ex.getMessage() );
             }
         }
@@ -91,7 +92,7 @@ public class DockerRuntimeExecExecutor<T extends DockerRuntimeConfig> implements
         try {
             creation = docker.getDockerClient( runtimeConfig.getProviderId() ).createContainer( containerConfig );
         } catch ( DockerException | InterruptedException ex ) {
-            LOG.error( ex.getMessage() , ex);
+            LOG.error( ex.getMessage(), ex );
             throw new ProvisioningException( "Error Creating Docker Container with image: " + runtimeConfig.getImage() + "with error: " + ex.getMessage() );
         }
 
@@ -118,20 +119,30 @@ public class DockerRuntimeExecExecutor<T extends DockerRuntimeConfig> implements
 
     @Override
     public boolean supports( final RuntimeId runtimeId ) {
-        return runtimeId instanceof DockerRuntime ||
-                runtimeRegistry.getRuntimeById( runtimeId.getId() ) instanceof DockerRuntime;
+        return runtimeId instanceof DockerRuntime
+                || runtimeRegistry.getRuntimeById( runtimeId.getId() ) instanceof DockerRuntime;
     }
 
     @Override
     public void destroy( final RuntimeId runtimeId ) {
         try {
-            // This causes issues with the remote client. Need to investigate
-            //docker.getDockerClient( runtimeId.getProviderId() ).killContainer( runtimeId.getId() );
+            LOG.info( "Killing Container: " + runtimeId.getId() );
+            docker.getDockerClient( runtimeId.getProviderId() ).killContainer( runtimeId.getId() );
+            LOG.info( "Removing Container: " + runtimeId.getId() );
             docker.getDockerClient( runtimeId.getProviderId() ).removeContainer( runtimeId.getId() );
             runtimeRegistry.unregisterRuntime( runtimeId );
         } catch ( DockerException | InterruptedException ex ) {
-            LOG.error( ex.getMessage() , ex);
-            throw new ProvisioningException( "Error destroying Docker Runtime: " + ex.getMessage() );
+            LOG.error( ex.getMessage(), ex );
+            try {
+                // Trying to remove the container if it cannot be killed
+                LOG.info( "Attempting to Remove Container without Killing: " + runtimeId.getId() );
+                docker.getDockerClient( runtimeId.getProviderId() ).removeContainer( runtimeId.getId() );
+                runtimeRegistry.unregisterRuntime( runtimeId );
+            } catch ( DockerException | InterruptedException ex2 ) {
+                LOG.error( ex.getMessage(), ex2 );
+                throw new ProvisioningException( "Error destroying Docker Runtime: " + ex.getMessage() );
+            }
+
         }
     }
 }

@@ -6,45 +6,19 @@
 package org.guvnor.ala.wildfly.model;
 
 import org.guvnor.ala.config.ProviderConfig;
-import org.guvnor.ala.runtime.providers.base.BaseProvider;
+import org.guvnor.ala.runtime.providers.Provider;
 
-public class WildflyProvider extends BaseProvider implements ProviderConfig {
+public interface WildflyProvider extends ProviderConfig,
+                                         Provider {
 
-    private final String hostId;
-    private final String port;
-    private final String managementPort;
-    private final String user;
-    private final String password;
+    String getHostId();
 
-    public WildflyProvider( final String name,
-                           final String hostId, String port, String managementPort, String user, String password ) {
-        super( name, WildflyProviderType.instance() );
-        this.hostId = hostId;
-        this.port = port;
-        this.managementPort = managementPort;
-        this.user = user;
-        this.password = password;
-        
-    }
+    String getPort();
 
-    public String getHostId() {
-        return hostId;
-    }
-    
-    public String getPort(){
-        return port;
-    }
+    String getManagementPort();
 
-    public String getManagementPort() {
-        return managementPort;
-    }
+    String getUser();
 
-    public String getUser() {
-        return user;
-    }
+    String getPassword();
 
-    public String getPassword() {
-        return password;
-    }
-    
 }

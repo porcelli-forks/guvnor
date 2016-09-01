@@ -1,15 +1,19 @@
 
-package org.guvnor.ala.docker.config;
+package org.guvnor.ala.docker.config.impl;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.guvnor.ala.config.CloneableConfig;
+import org.guvnor.ala.docker.config.DockerRuntimeConfig;
+import org.guvnor.ala.docker.config.DockerRuntimeExecConfig;
 import org.guvnor.ala.pipeline.ContextAware;
 import org.guvnor.ala.runtime.providers.ProviderId;
 
 public class ContextAwareDockerRuntimeExecConfig implements
-        ContextAware,
-        DockerRuntimeExecConfig {
+                                                 ContextAware,
+                                                 DockerRuntimeExecConfig,
+                                                 CloneableConfig<DockerRuntimeExecConfig> {
 
     @JsonIgnore
     private Map<String, ?> context;
@@ -18,11 +22,24 @@ public class ContextAwareDockerRuntimeExecConfig implements
     private String port;
     private boolean pull;
 
+    public ContextAwareDockerRuntimeExecConfig() {
+    }
+
+    public ContextAwareDockerRuntimeExecConfig( final ProviderId providerId,
+                                                final String image,
+                                                final String port,
+                                                final boolean pull ) {
+        this.providerId = providerId;
+        this.image = image;
+        this.port = port;
+        this.pull = pull;
+    }
+
     @Override
     @JsonIgnore
     public void setContext( final Map<String, ?> context ) {
         this.context = context;
-        final DockerRuntimeConfig dockerRuntimeConfiguration = ( DockerRuntimeConfig ) context.get( "docker-runtime-config" );
+        final DockerRuntimeConfig dockerRuntimeConfiguration = (DockerRuntimeConfig) context.get( "docker-runtime-config" );
         this.providerId = dockerRuntimeConfiguration.getProviderId();
         this.image = dockerRuntimeConfiguration.getImage();
         this.port = dockerRuntimeConfiguration.getPort();
@@ -68,6 +85,14 @@ public class ContextAwareDockerRuntimeExecConfig implements
     @Override
     public String toString() {
         return "ContextAwareDockerRuntimeExecConfig{" + "providerId=" + providerId + ", image=" + image + ", port=" + port + ", pull=" + pull + '}';
+    }
+
+    @Override
+    public DockerRuntimeExecConfig asNewClone( final DockerRuntimeExecConfig source ) {
+        return new ContextAwareDockerRuntimeExecConfig( source.getProviderId(),
+                                                        source.getImage(),
+                                                        source.getPort(),
+                                                        source.isPull() );
     }
 
 }

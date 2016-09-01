@@ -11,16 +11,16 @@ import javax.inject.Inject;
 
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.kie.scanner.embedder.MavenProjectLoader;
-import org.uberfire.java.nio.file.Files;
-import org.uberfire.java.nio.file.Path;
 import org.guvnor.ala.build.maven.config.MavenProjectConfig;
 import org.guvnor.ala.build.maven.model.PlugIn;
+import org.guvnor.ala.build.maven.model.impl.MavenProjectImpl;
 import org.guvnor.ala.config.Config;
 import org.guvnor.ala.config.ProjectConfig;
 import org.guvnor.ala.pipeline.BiFunctionConfigExecutor;
 import org.guvnor.ala.registry.SourceRegistry;
 import org.guvnor.ala.source.Source;
+import org.kie.scanner.embedder.MavenProjectLoader;
+import org.uberfire.java.nio.file.Files;
 
 
 public class MavenProjectConfigExecutor implements BiFunctionConfigExecutor<Source, MavenProjectConfig, ProjectConfig> {
@@ -40,47 +40,15 @@ public class MavenProjectConfigExecutor implements BiFunctionConfigExecutor<Sour
 
         final Collection<PlugIn> buildPlugins = extractPlugins( project );
 
-        final org.guvnor.ala.build.maven.model.MavenProject mavenProject = new org.guvnor.ala.build.maven.model.MavenProject() {
-            @Override
-            public String getId() {
-                return project.getId();
-            }
-
-            @Override
-            public String getType() {
-                return project.getArtifact().getType();
-            }
-
-            @Override
-            public String getName() {
-                return project.getName();
-            }
-
-            @Override
-            public String getExpectedBinary() {
-                return project.getArtifact().getArtifactId() + "-" +  project.getArtifact().getVersion() +  "." + project.getArtifact().getType();
-            }
-
-            @Override
-            public Path getRootPath() {
-                return source.getPath();
-            }
-
-            @Override
-            public Path getPath() {
-                return source.getPath().resolve( mavenProjectConfig.getProjectDir() );
-            }
-
-            @Override
-            public Path getBinaryPath() {
-                return getPath().resolve( "target" ).resolve( getExpectedBinary() ).toAbsolutePath();
-            }
-
-            @Override
-            public Collection<PlugIn> getBuildPlugins() {
-                return buildPlugins;
-            }
-        };
+        final String expectedBinary = project.getArtifact().getArtifactId() + "-" + project.getArtifact().getVersion() + "." + project.getArtifact().getType();
+        final org.guvnor.ala.build.maven.model.MavenProject mavenProject = new MavenProjectImpl( project.getId(),
+                                                                                                 project.getArtifact().getType(),
+                                                                                                 project.getName(),
+                                                                                                 expectedBinary,
+                                                                                                 source.getPath(),
+                                                                                                 source.getPath().resolve( mavenProjectConfig.getProjectDir() ),
+                                                                                                 source.getPath().resolve( "target" ).resolve( expectedBinary ).toAbsolutePath(),
+                                                                                                 buildPlugins );
 
         sourceRegistry.registerProject( source, mavenProject );
 

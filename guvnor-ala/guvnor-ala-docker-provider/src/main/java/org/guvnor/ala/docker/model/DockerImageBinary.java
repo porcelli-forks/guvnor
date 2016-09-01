@@ -16,40 +16,8 @@
 
 package org.guvnor.ala.docker.model;
 
-import org.uberfire.java.nio.file.Path;
 import org.guvnor.ala.build.Binary;
-import org.guvnor.ala.build.Project;
 
-import static org.uberfire.commons.validation.PortablePreconditions.*;
-
-public class DockerImageBinary implements Binary {
-
-    private String type;
-    private Project sourceProject;
-
-    public DockerImageBinary( final Project sourceProject ) {
-        this.type = "Docker";
-        this.sourceProject = checkNotNull( "sourceProject", sourceProject );
-    }
-
-    @Override
-    public Project getProject() {
-        return sourceProject;
-    }
-
-    @Override
-    public Path getPath() {
-        return sourceProject.getPath();
-    }
-
-    @Override
-    public String getType() {
-        return type;
-    }
-
-    @Override
-    public String getName() {
-        return sourceProject.getExpectedBinary();
-    }
+public interface DockerImageBinary extends Binary {
 
 }

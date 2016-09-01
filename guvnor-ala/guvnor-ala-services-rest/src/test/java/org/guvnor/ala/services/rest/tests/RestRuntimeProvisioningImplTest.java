@@ -33,7 +33,7 @@ import org.guvnor.ala.services.rest.RestRuntimeProvisioningServiceImpl;
 import org.guvnor.ala.services.rest.factories.ProviderFactory;
 import org.guvnor.ala.services.rest.factories.RuntimeFactory;
 import org.guvnor.ala.services.rest.factories.RuntimeManagerFactory;
-import org.guvnor.ala.wildfly.config.WildflyProviderConfigExecutor;
+import org.guvnor.ala.wildfly.executor.WildflyProviderConfigExecutor;
 import org.guvnor.ala.wildfly.model.WildflyProviderType;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;

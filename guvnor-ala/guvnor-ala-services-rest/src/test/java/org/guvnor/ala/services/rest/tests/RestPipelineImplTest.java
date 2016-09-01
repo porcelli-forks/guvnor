@@ -26,8 +26,8 @@ import org.guvnor.ala.config.ProjectConfig;
 import org.guvnor.ala.config.ProviderConfig;
 import org.guvnor.ala.docker.access.DockerAccessInterface;
 import org.guvnor.ala.docker.access.impl.DockerAccessInterfaceImpl;
-import org.guvnor.ala.docker.config.ContextAwareDockerProvisioningConfig;
-import org.guvnor.ala.docker.config.ContextAwareDockerRuntimeExecConfig;
+import org.guvnor.ala.docker.config.impl.ContextAwareDockerProvisioningConfig;
+import org.guvnor.ala.docker.config.impl.ContextAwareDockerRuntimeExecConfig;
 import org.guvnor.ala.docker.config.DockerProviderConfig;
 import org.guvnor.ala.docker.executor.DockerProviderConfigExecutor;
 import org.guvnor.ala.docker.executor.DockerRuntimeExecExecutor;
@@ -49,7 +49,7 @@ import org.guvnor.ala.services.rest.RestRuntimeProvisioningServiceImpl;
 import org.guvnor.ala.services.rest.factories.ProviderFactory;
 import org.guvnor.ala.services.rest.factories.RuntimeFactory;
 import org.guvnor.ala.services.rest.factories.RuntimeManagerFactory;
-import org.guvnor.ala.wildfly.config.WildflyProviderConfigExecutor;
+import org.guvnor.ala.wildfly.executor.WildflyProviderConfigExecutor;
 import org.guvnor.ala.wildfly.model.WildflyProviderType;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -216,7 +216,6 @@ public class RestPipelineImplTest {
         configs.add( new ContextAwareDockerRuntimeExecConfig() );
 
         String newPipeline = pipelineService.newPipeline( new PipelineConfigImpl( "mypipe", configs ) );
-        System.out.println( "Pipeline: " + newPipeline );
 
         allPipelineConfigs = pipelineService.getAllPipelineConfigs();
 

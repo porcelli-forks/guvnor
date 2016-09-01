@@ -1,21 +1,15 @@
 package org.guvnor.ala.build.maven.executor;
 
-import org.guvnor.ala.build.maven.executor.MavenBuildExecConfigExecutor;
-import org.guvnor.ala.build.maven.executor.MavenBuildConfigExecutor;
-import org.guvnor.ala.build.maven.executor.MavenProjectConfigExecutor;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 import org.guvnor.ala.build.Binary;
-import org.guvnor.ala.build.maven.config.MavenBuildConfig;
-import org.guvnor.ala.build.maven.config.MavenBuildExecConfig;
-import org.guvnor.ala.build.maven.config.MavenProjectConfig;
+import org.guvnor.ala.build.maven.config.impl.MavenBuildConfigImpl;
+import org.guvnor.ala.build.maven.config.impl.MavenBuildExecConfigImpl;
+import org.guvnor.ala.build.maven.config.impl.MavenProjectConfigImpl;
 import org.guvnor.ala.config.BinaryConfig;
 import org.guvnor.ala.config.BuildConfig;
 import org.guvnor.ala.config.ProjectConfig;
@@ -32,6 +26,9 @@ import org.guvnor.ala.registry.local.InMemoryBuildRegistry;
 import org.guvnor.ala.registry.local.InMemorySourceRegistry;
 import org.guvnor.ala.source.git.config.GitConfig;
 import org.guvnor.ala.source.git.executor.GitConfigExecutor;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import static java.util.Arrays.*;
 import static org.guvnor.ala.pipeline.StageUtil.*;
@@ -60,12 +57,9 @@ public class MavenProjectConfigExecutorTest {
         final BuildRegistry buildRegistry = new InMemoryBuildRegistry();
 
         final Stage<Input, SourceConfig> sourceConfig = config( "Git Source", ( s ) -> new MyGitConfig() );
-        final Stage<SourceConfig, ProjectConfig> projectConfig = config( "Maven Project", ( s ) -> new MavenProjectConfig() {
-        } );
-        final Stage<ProjectConfig, BuildConfig> buildConfig = config( "Maven Build Config", ( s ) -> new MavenBuildConfig() {
-        } );
-        final Stage<BuildConfig, BinaryConfig> buildExec = config( "Maven Build", ( s ) -> new MavenBuildExecConfig() {
-        } );
+        final Stage<SourceConfig, ProjectConfig> projectConfig = config( "Maven Project", ( s ) -> new MavenProjectConfigImpl() );
+        final Stage<ProjectConfig, BuildConfig> buildConfig = config( "Maven Build Config", ( s ) -> new MavenBuildConfigImpl() );
+        final Stage<BuildConfig, BinaryConfig> buildExec = config( "Maven Build", ( s ) -> new MavenBuildExecConfigImpl() );
         final Pipeline pipe = PipelineFactory
                 .startFrom( sourceConfig )
                 .andThen( projectConfig )

@@ -37,7 +37,6 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.jboss.dmr.ModelNode;
 
-import static java.lang.System.*;
 import java.util.Date;
 import static java.util.logging.Level.*;
 import static java.util.logging.Logger.*;
@@ -102,7 +101,6 @@ public class WildflyClient {
         operation.get( "enabled" ).set( true );
         operation.get( "content" ).add().get( "input-stream-index" ).set( 0 );  // point to the multipart index used
 
-        System.out.println( "> Deploying -> " + operation.toJSONString( true ) );
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         try {
             operation.writeBase64( bout );
@@ -117,18 +115,11 @@ public class WildflyClient {
         builder.addPart( "operation", new ByteArrayBody( bout.toByteArray(), create( "application/dmr-encoded" ), "blob" ) );
         HttpEntity entity = builder.build();
 
-//        try {
-//            entity.writeTo( System.out );
-//        } catch ( IOException ex ) {
-//            Logger.getLogger( WildflyClient.class.getName() ).log( Level.SEVERE, null, ex );
-//        }
         post.setEntity( entity );
 
         try {
             HttpResponse response = httpclient.execute( post );
 
-            out.println( ">>> Deploying Response Entity: " + response.getEntity() );
-            out.println( ">>> Deploying Response Satus: " + response.getStatusLine().getStatusCode() );
             return response.getStatusLine().getStatusCode();
         } catch ( IOException ex ) {
             ex.printStackTrace();
@@ -156,7 +147,6 @@ public class WildflyClient {
         operation.get( "operation" ).set( "remove" );
         operation.get( "address" ).add( "deployment", deploymentName );
 
-        System.out.println( "> UnDeploying -> " + operation.toJSONString( true ) );
         try {
             post.setEntity( new StringEntity( operation.toJSONString( true ), APPLICATION_JSON ) );
         } catch ( Exception e ) {
@@ -165,10 +155,6 @@ public class WildflyClient {
 
         try {
             HttpResponse response = httpclient.execute( post );
-
-            out.println( ">>> Undeploy Response Entity: " + response.getEntity() );
-            out.println( ">>> Undeploy Response Satus: " + response.getStatusLine().getStatusCode() );
-            System.err.println( response.getStatusLine().getStatusCode() );
             return response.getStatusLine().getStatusCode();
         } catch ( IOException ex ) {
             ex.printStackTrace();
@@ -200,7 +186,6 @@ public class WildflyClient {
         operation.get( "operation" ).set( "deploy" );
         operation.get( "address" ).add( "deployment", deploymentName );
 
-        System.out.println( "> Starting -> " + operation.toJSONString( true ) );
         try {
             post.setEntity( new StringEntity( operation.toJSONString( true ), APPLICATION_JSON ) );
         } catch ( Exception e ) {
@@ -209,10 +194,6 @@ public class WildflyClient {
 
         try {
             HttpResponse response = httpclient.execute( post );
-
-            out.println( ">>> Deploy Response Entity: " + response.getEntity() );
-            out.println( ">>> Deploy Response Satus: " + response.getStatusLine().getStatusCode() );
-            System.err.println( response.getStatusLine().getStatusCode() );
             return response.getStatusLine().getStatusCode();
         } catch ( IOException ex ) {
             ex.printStackTrace();
@@ -240,7 +221,6 @@ public class WildflyClient {
         operation.get( "operation" ).set( "undeploy" );
         operation.get( "address" ).add( "deployment", deploymentName );
 
-        System.out.println( "> Stopping -> " + operation.toJSONString( true ) );
         try {
             post.setEntity( new StringEntity( operation.toJSONString( true ), APPLICATION_JSON ) );
         } catch ( Exception e ) {
@@ -249,10 +229,6 @@ public class WildflyClient {
 
         try {
             HttpResponse response = httpclient.execute( post );
-
-            out.println( ">>> Stop Response Entity: " + response.getEntity() );
-            out.println( ">>> Stop Response Satus: " + response.getStatusLine().getStatusCode() );
-            System.err.println( response.getStatusLine().getStatusCode() );
             return response.getStatusLine().getStatusCode();
         } catch ( IOException ex ) {
             ex.printStackTrace();
@@ -284,7 +260,6 @@ public class WildflyClient {
         operation.get( "operation" ).set( "read-resource" );
         operation.get( "address" ).add( "deployment", deploymentName );
         operation.get( "resolve-expressions" ).set( "true" );
-        System.out.println( "> REFRESHING -> " + operation.toJSONString( true ) );
         try {
             post.setEntity( new StringEntity( operation.toJSONString( true ), APPLICATION_JSON ) );
         } catch ( Exception e ) {
@@ -310,9 +285,6 @@ public class WildflyClient {
                 }
                 return new WildflyAppState( state, new Date() );
             }
-            out.println( ">>> Refresh Response Entity: " + json );
-            out.println( ">>> Refresh Response Satus: " + response.getStatusLine().getStatusCode() );
-            System.err.println( response.getStatusLine().getStatusCode() );
 
         } catch ( IOException ex ) {
             ex.printStackTrace();

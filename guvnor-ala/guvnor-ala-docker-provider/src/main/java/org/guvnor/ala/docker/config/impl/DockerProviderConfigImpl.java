@@ -16,21 +16,35 @@
 
 package org.guvnor.ala.docker.config.impl;
 
+import org.guvnor.ala.config.CloneableConfig;
 import org.guvnor.ala.docker.config.DockerProviderConfig;
 
-public class DockerProviderConfigImpl implements DockerProviderConfig {
+public class DockerProviderConfigImpl implements DockerProviderConfig,
+                                                 CloneableConfig<DockerProviderConfig> {
 
     private String name;
     private String hostIp;
 
+    public DockerProviderConfigImpl() {
+        this.name = DockerProviderConfig.super.getName();
+        this.hostIp = DockerProviderConfig.super.getHostIp();
+
+    }
+
+    public DockerProviderConfigImpl( final String name,
+                                     final String hostIp ) {
+        this.name = name;
+        this.hostIp = hostIp;
+    }
+
     @Override
     public String getHostIp() {
-        return ( hostIp != null ) ? hostIp : DockerProviderConfig.super.getHostIp();
+        return hostIp;
     }
 
     @Override
     public String getName() {
-        return ( name != null ) ? name : DockerProviderConfig.super.getName();
+        return name;
     }
 
     public void setName( String name ) {
@@ -46,4 +60,8 @@ public class DockerProviderConfigImpl implements DockerProviderConfig {
         return "DockerProviderConfigImpl{" + "name=" + name + ", hostIp=" + hostIp + '}';
     }
 
+    @Override
+    public DockerProviderConfig asNewClone( final DockerProviderConfig origin ) {
+        return new DockerProviderConfigImpl( origin.getName(), origin.getHostIp() );
+    }
 }

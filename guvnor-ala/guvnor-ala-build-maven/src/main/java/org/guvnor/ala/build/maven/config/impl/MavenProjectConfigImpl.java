@@ -17,18 +17,24 @@
 package org.guvnor.ala.build.maven.config.impl;
 
 import org.guvnor.ala.build.maven.config.MavenProjectConfig;
+import org.guvnor.ala.config.CloneableConfig;
 
-public class MavenProjectConfigImpl implements MavenProjectConfig {
+public class MavenProjectConfigImpl implements MavenProjectConfig,
+                                               CloneableConfig<MavenProjectConfig> {
 
-    private String projectDir;
+    private final String projectDir;
+
+    public MavenProjectConfigImpl() {
+        this.projectDir = MavenProjectConfig.super.getProjectDir();
+    }
+
+    public MavenProjectConfigImpl( final String projectDir ) {
+        this.projectDir = projectDir;
+    }
 
     @Override
     public String getProjectDir() {
-        return ( projectDir != null ) ? projectDir : MavenProjectConfig.super.getProjectDir();
-    }
-
-    public void setProjectDir( String projectDir ) {
-        this.projectDir = projectDir;
+        return projectDir;
     }
 
     @Override
@@ -36,4 +42,8 @@ public class MavenProjectConfigImpl implements MavenProjectConfig {
         return "MavenProjectConfigImpl{" + "projectDir=" + projectDir + '}';
     }
 
+    @Override
+    public MavenProjectConfig asNewClone( final MavenProjectConfig source ) {
+        return new MavenProjectConfigImpl( source.getProjectDir() );
+    }
 }

@@ -16,34 +16,53 @@
 
 package org.guvnor.ala.source.git.config.impl;
 
+import org.guvnor.ala.config.CloneableConfig;
 import org.guvnor.ala.source.git.config.GitConfig;
 
-public class GitConfigImpl implements GitConfig {
+public class GitConfigImpl implements GitConfig,
+                                      CloneableConfig<GitConfig> {
 
     private String outPath;
     private String branch;
     private String origin;
     private String repoName;
 
+    public GitConfigImpl() {
+        this.outPath = GitConfig.super.getOutPath();
+        this.branch = GitConfig.super.getBranch();
+        this.origin = GitConfig.super.getOrigin();
+        this.repoName = GitConfig.super.getRepoName();
+    }
+
+    public GitConfigImpl( final String outPath,
+                          final String branch,
+                          final String origin,
+                          final String repoName ) {
+        this.outPath = outPath;
+        this.branch = branch;
+        this.origin = origin;
+        this.repoName = repoName;
+    }
+
     @Override
     public String getOutPath() {
-        return ( outPath != null ) ? outPath : GitConfig.super.getOutPath();
+        return outPath;
 
     }
 
     @Override
     public String getBranch() {
-        return ( branch != null ) ? branch : GitConfig.super.getBranch();
+        return branch;
     }
 
     @Override
     public String getOrigin() {
-        return ( origin != null ) ? origin : GitConfig.super.getOrigin();
+        return origin;
     }
 
     @Override
     public String getRepoName() {
-        return ( repoName != null ) ? repoName : GitConfig.super.getRepoName();
+        return repoName;
     }
 
     public void setOutPath( String outPath ) {
@@ -65,6 +84,14 @@ public class GitConfigImpl implements GitConfig {
     @Override
     public String toString() {
         return "GitConfigImpl{" + "outPath=" + outPath + ", branch=" + branch + ", origin=" + origin + ", repoName=" + repoName + '}';
+    }
+
+    @Override
+    public GitConfig asNewClone( final GitConfig source ) {
+        return new GitConfigImpl( source.getOutPath(),
+                                  source.getBranch(),
+                                  source.getOrigin(),
+                                  source.getRepoName() );
     }
 
 }

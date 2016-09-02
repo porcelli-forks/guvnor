@@ -22,12 +22,20 @@ import static com.fasterxml.jackson.annotation.JsonTypeInfo.As.*;
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.*;
 
 /**
- * @author salaboy
+ * Represent the State of a particular runtime
  */
 @JsonTypeInfo(use = CLASS, include = WRAPPER_OBJECT)
 public interface RuntimeState {
 
+    /*
+     * Get the Runtime Status
+     * @return String with the Status
+    */
     String getStatus();
 
+    /*
+     * Get the Runtime started at time as String
+     * @return String with the started At timestamp
+    */
     String getStartedAt();
 }

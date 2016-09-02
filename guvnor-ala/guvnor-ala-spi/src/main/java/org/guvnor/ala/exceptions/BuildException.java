@@ -17,7 +17,7 @@
 package org.guvnor.ala.exceptions;
 
 /**
- * @author salaboy
+ * BuildException to be used in different Builders implementations.
  */
 public class BuildException extends RuntimeException {
 
@@ -26,7 +26,7 @@ public class BuildException extends RuntimeException {
     }
 
     public BuildException( String message,
-                           Throwable cause ) {
+            Throwable cause ) {
         super( message, cause );
     }
 

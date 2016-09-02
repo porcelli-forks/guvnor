@@ -16,7 +16,9 @@ import org.apache.commons.lang.text.StrSubstitutor;
 import org.guvnor.ala.config.CloneableConfig;
 
 /**
- * TODO: update me
+ * This class deals with Variable Interpolations inside pipelines. 
+ * It uses byteman to create intermediary types for the results 
+ *  created by the interpolation process
  */
 public final class VariableInterpolation {
 

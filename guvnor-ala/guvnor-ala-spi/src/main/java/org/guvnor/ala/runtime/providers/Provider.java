@@ -22,7 +22,6 @@ import static com.fasterxml.jackson.annotation.JsonTypeInfo.As.*;
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.*;
 
 /**
- * <p>
  * A provider represent a running entity that allows us to provision new
  * runtimes. Such as: Docker, Kubernetes, Application Servers (Wildfly, Tomcat,
  * etc)
@@ -30,6 +29,11 @@ import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.*;
 @JsonTypeInfo(use = CLASS, include = WRAPPER_OBJECT)
 public interface Provider extends ProviderId {
 
+    /*
+     * Get the Provider Configuration that was used to Configure this provider instance
+     * @return ProviderConfig with the Provider configuration
+     * @see ProviderConfig
+    */
     ProviderConfig getConfig();
 
 }

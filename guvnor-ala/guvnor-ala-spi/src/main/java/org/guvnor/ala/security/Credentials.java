@@ -16,6 +16,9 @@
 
 package org.guvnor.ala.security;
 
+/*
+ * Generic Credential interface used to support Authentication/Authorization mechanisms
+*/
 public interface Credentials {
 
 }

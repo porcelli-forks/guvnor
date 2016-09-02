@@ -23,6 +23,9 @@ import org.guvnor.ala.runtime.RuntimeInfo;
 import org.guvnor.ala.runtime.RuntimeState;
 import org.guvnor.ala.runtime.providers.ProviderId;
 
+/*
+ * BaseRuntime implementation to be extended by each Runtime Provider
+*/
 public abstract class BaseRuntime implements Runtime {
 
     private String id;

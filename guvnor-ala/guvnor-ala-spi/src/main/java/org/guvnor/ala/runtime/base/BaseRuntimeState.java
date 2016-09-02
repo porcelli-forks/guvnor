@@ -18,6 +18,9 @@ package org.guvnor.ala.runtime.base;
 
 import org.guvnor.ala.runtime.RuntimeState;
 
+/*
+ * BaseRuntimeState implementation to be extended by each Runtime Provider
+*/
 public class BaseRuntimeState implements RuntimeState {
 
     private String status = "NA";

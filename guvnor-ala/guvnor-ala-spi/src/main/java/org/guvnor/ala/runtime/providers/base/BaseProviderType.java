@@ -17,6 +17,9 @@ package org.guvnor.ala.runtime.providers.base;
 
 import org.guvnor.ala.runtime.providers.ProviderType;
 
+/*
+ * BaseProviderType implementation to be extended by concrete ProviderTypes
+*/
 public abstract class BaseProviderType implements ProviderType {
 
     private String providerTypeName;

@@ -21,18 +21,36 @@ import org.uberfire.java.nio.file.Path;
 import org.guvnor.ala.config.BinaryConfig;
 
 /**
- * @author salaboy
- *         Generic Binary type used to store information about the generated binaries.
+ * Store information about the generated binary. Implement this interface
+ *  to support different Binary types.
  */
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.WRAPPER_OBJECT)
+@JsonTypeInfo( use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.WRAPPER_OBJECT )
 public interface Binary extends BinaryConfig {
 
+    /*
+     * Get the binary related project that was used to create it
+     * @return the Project
+     * @see Project
+     */
     Project getProject();
 
+    /*
+     * Get the path location for the generated binary
+     * @return the Path
+     * @see Path
+     */
     Path getPath();
 
+    /*
+     * Get the type of the binary
+     * @return the type as String
+     */
     String getType();
 
+    /*
+     * Get the binary's name
+     * @return the binary name as String
+     */
     String getName();
 
 }

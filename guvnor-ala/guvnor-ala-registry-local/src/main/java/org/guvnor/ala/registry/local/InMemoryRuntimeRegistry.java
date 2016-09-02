@@ -64,7 +64,7 @@ public class InMemoryRuntimeRegistry implements RuntimeRegistry {
     }
 
     @Override
-    public ProviderType getProviderTypeByName( String provider ) {
+    public ProviderType getProviderType( String provider ) {
         return providerTypes.get( provider );
     }
 

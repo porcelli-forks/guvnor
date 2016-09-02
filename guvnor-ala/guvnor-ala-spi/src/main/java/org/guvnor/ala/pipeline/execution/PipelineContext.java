@@ -27,7 +27,13 @@ import java.util.function.Consumer;
 import org.guvnor.ala.pipeline.Pipeline;
 import org.guvnor.ala.pipeline.Stage;
 
-class PipelineContext {
+/*
+ * Represent the contextual information used by the Pipeline Executor. 
+ * it host all the variables that are going to be used to execute the different stages in the
+ *  pipeline. 
+*/
+
+public class PipelineContext {
 
     private final Iterator<Stage> iterator;
     private Optional<Object> initialInput = Optional.empty();

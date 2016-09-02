@@ -19,6 +19,9 @@ import org.guvnor.ala.config.ProviderConfig;
 import org.guvnor.ala.runtime.providers.Provider;
 import org.guvnor.ala.runtime.providers.ProviderType;
 
+/*
+ * BaseProvide implementation to be extended by concrete Providers
+*/
 public abstract class BaseProvider implements Provider {
 
     protected String id;

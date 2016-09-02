@@ -18,6 +18,9 @@ package org.guvnor.ala.runtime.base;
 
 import org.guvnor.ala.runtime.RuntimeEndpoint;
 
+/*
+ * BaseRuntimeEndpoint implementation to be extended by each Runtime Provider
+*/
 public class BaseRuntimeEndpoint implements RuntimeEndpoint {
 
     private String host;

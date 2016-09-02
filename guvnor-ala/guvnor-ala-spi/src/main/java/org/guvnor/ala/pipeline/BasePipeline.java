@@ -18,6 +18,9 @@ package org.guvnor.ala.pipeline;
 
 import java.util.List;
 
+/*
+ * Base Pipeline implementation
+ */
 public class BasePipeline implements Pipeline {
 
     private String name;
@@ -58,5 +61,5 @@ public class BasePipeline implements Pipeline {
     public void setConfig( PipelineConfig config ) {
         this.config = config;
     }
-    
+
 }

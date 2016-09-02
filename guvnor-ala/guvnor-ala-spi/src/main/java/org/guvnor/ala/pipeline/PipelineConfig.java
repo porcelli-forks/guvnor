@@ -20,10 +20,22 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.util.List;
 import org.guvnor.ala.config.Config;
 
+/*
+ * Represent the configuration for a Pipeline containing each stage detailed configuration.
+*/
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.WRAPPER_OBJECT)
 public interface PipelineConfig {
 
+    /*
+     * Get the pipeline name
+     * @return the name of the pipeline that will be created based on this configuration.
+    */
     String getName();
 
+    /*
+     * Get the list of configurations, each representing a Stage
+     * @return List<Config> for all the stages in the pipeline that will 
+     *   be built using this configuration
+    */
     List<Config> getConfigStages();
 }

@@ -24,23 +24,55 @@ import static com.fasterxml.jackson.annotation.JsonTypeInfo.As.*;
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.*;
 
 /**
- *         Generic Project type to be used by the Build service.
+ * Represent one logical project Project. Implement this interface
+ * to provider different project types.
  */
-@JsonTypeInfo(use = CLASS, include = WRAPPER_OBJECT)
+@JsonTypeInfo( use = CLASS, include = WRAPPER_OBJECT )
 public interface Project extends ProjectConfig {
 
+    /*
+     * Get the project Id
+     * @return the project Id
+     */
     String getId();
 
+    /*
+     * Get the project type as String
+     * @return the project Type
+     */
     String getType();
 
+    /*
+     * Get the project name
+     * @return the project Name
+     */
     String getName();
 
+    /*
+     * Get the project expected binary name
+     * @return the expected binary name
+     */
     String getExpectedBinary();
 
+    /*
+     * Get the project root path
+     * @return the project Root Path
+     * @see Path
+     */
     Path getRootPath();
 
+    /*
+     * Get the project path
+     * @return the project Path
+     * @see Path
+     */
     Path getPath();
 
+    /*
+     * Get the project path where the produced binary will be stored
+     * @return the project binary result Path
+     * @see Path
+     */
     Path getBinaryPath();
 
 }

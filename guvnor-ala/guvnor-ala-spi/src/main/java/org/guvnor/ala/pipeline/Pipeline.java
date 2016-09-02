@@ -18,12 +18,31 @@ package org.guvnor.ala.pipeline;
 
 import java.util.List;
 
+/*
+ * Represents a generic Pipeline with a List of stages and a Pipeline 
+ *  configuration.
+ * @see PipelineConfig
+ */
 public interface Pipeline {
 
+    /*
+     * Get the pipeline name
+     * @return the pipeline name
+     */
     String getName();
 
+    /*
+     * Get the list of stages for this pipeline
+     * @return List<Stages>
+     * @see Stage
+     */
     List<Stage> getStages();
-    
+
+    /*
+     * Get the pipeline configurations
+     * @return the PipelineConfig
+     * @see PipelineConfig
+     */
     PipelineConfig getConfig();
 
 }

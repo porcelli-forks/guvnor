@@ -24,18 +24,47 @@ import org.guvnor.ala.security.Credentials;
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.As.*;
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.*;
 
+/*
+ * Service Host representation with credentials
+*/
 @JsonTypeInfo(use = CLASS, include = WRAPPER_OBJECT)
 public interface Host<C extends Credentials> {
 
+    /*
+     * Get Host Id
+     * @return String with the host id
+    */
     String getId();
 
+    /*
+     * Get Host Name
+     * @return String with the host name
+    */
     String getName();
 
+    /*
+     * Get Repository for the Host
+     * @param String repositoryId
+     * @return Repository with the provided Repository Id
+    */
     Repository getRepository( final String id );
 
+     /*
+     * Get Repository for the Host
+     * @param String repositoryId
+     * @param Map<String, String> with repository configurations
+     * @return Repository with the provided Repository Id and configurations
+    */
     Repository getRepository( final String id,
                               final Map<String, String> config );
 
+    /*
+     * Get Repository for the Host
+     * @param Credentials credentials used to access the host
+     * @param String repositoryId
+     * @param Map<String, String> with repository configurations
+     * @return Repository with the provided Repository Id and configurations
+    */
     Repository getRepository( final C credential,
                               final String repositoryId,
                               final Map<String, String> config );

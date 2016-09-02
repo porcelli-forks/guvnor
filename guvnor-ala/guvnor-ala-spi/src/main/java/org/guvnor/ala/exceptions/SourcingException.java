@@ -17,7 +17,8 @@
 package org.guvnor.ala.exceptions;
 
 /**
- * @author salaboy
+ * SourcingException to be used in different sourcing mechanisms
+ * implementations.
  */
 public class SourcingException extends RuntimeException {
 

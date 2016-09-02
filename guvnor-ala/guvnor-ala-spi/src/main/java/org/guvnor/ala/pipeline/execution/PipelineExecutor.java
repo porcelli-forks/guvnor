@@ -1,4 +1,18 @@
-
+/*
+ * Copyright (C) 2016 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.guvnor.ala.pipeline.execution;
 
 import java.util.Collection;
@@ -18,6 +32,10 @@ import org.guvnor.ala.pipeline.Stage;
 
 import static org.guvnor.ala.util.VariableInterpolation.*;
 
+/*
+ * Represent the Pipeline Executor which will be in charge of executing a pipeline instance 
+ *  by using the Input data provided. After executing the pipeline a Consumer callback will be executed.
+*/
 public class PipelineExecutor {
 
     private final Map<Class, ConfigExecutor> configExecutors = new HashMap<>();

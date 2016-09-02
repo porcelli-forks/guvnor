@@ -23,31 +23,74 @@ import static com.fasterxml.jackson.annotation.JsonTypeInfo.As.*;
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.*;
 
 /**
- *         <p>
- *         This class represent a Runtime (Docker Image running or a WAR deployed into a
- *         server)
- *         It also allows you to interact with the runtime state executing operations
- *         such as start, stop, restart
+ * Implementations of this interface represent a Runtime (Docker Image running
+ * or a WAR deployed into a
+ * server)
  */
-@JsonTypeInfo(use = CLASS, include = WRAPPER_OBJECT)
+@JsonTypeInfo( use = CLASS, include = WRAPPER_OBJECT )
 public interface Runtime extends RuntimeId {
 
+    /*
+     * Set the runtime id
+     * @param String id
+     * 
+     */
     void setId( String id );
 
+    /*
+     * Get the runtime endpoint
+     * @return RuntimeEndpoint
+     * @see RuntimeEndpoint
+     */
     RuntimeEndpoint getEndpoint();
 
+    /*
+     * Set the runtime endpoint
+     * @param RuntimeEndpoint to be set
+     * @see RuntimeEndpoint
+     */
     void setEndpoint( RuntimeEndpoint endpoint );
 
+    /*
+     * Set the runtime config
+     * @param RuntimeConfig to be set
+     * @see RuntimeConfig
+     */
     void setConfig( RuntimeConfig config );
 
+    /*
+     * Get the runtime config
+     * @return RuntimeConfig for this Runtime
+     * @see RuntimeConfig
+     */
     RuntimeConfig getConfig();
 
+    /*
+     * Set the runtime state
+     * @param RuntimeState to be set
+     * @see RuntimeState
+     */
     void setState( RuntimeState state );
 
+    /*
+     * Get the runtime state
+     * @return RuntimeState for this Runtime
+     * @see RuntimeState
+     */
     RuntimeState getState();
 
+    /*
+     * Set the runtime info
+     * @param RuntimeInfo to be set
+     * @see RuntimeInfo
+     */
     void setInfo( RuntimeInfo info );
 
+    /*
+     * Get the runtime info
+     * @return RuntimeInfo for this Runtime
+     * @see RuntimeInfo
+     */
     RuntimeInfo getInfo();
 
 }

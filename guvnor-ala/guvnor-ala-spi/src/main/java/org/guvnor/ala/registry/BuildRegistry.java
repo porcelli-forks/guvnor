@@ -20,10 +20,23 @@ import java.util.List;
 
 import org.guvnor.ala.build.Binary;
 
+/*
+ * Represents the BuildRegistry where all the Binaries built by the system will be registered
+*/
 public interface BuildRegistry {
 
+    /*
+     * Register a new binary
+     * @param Binary to be registered
+     * @see Binary
+    */
     void registerBinary( final Binary binary );
 
+    /*
+     * Returns all the registered binaraies
+     * @return a List<Binary> with all the registered binaries
+     * @see Binary
+    */
     List<Binary> getAllBinaries();
 
 }

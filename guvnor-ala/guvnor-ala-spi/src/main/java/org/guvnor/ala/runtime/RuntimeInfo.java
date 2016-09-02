@@ -23,16 +23,15 @@ import static com.fasterxml.jackson.annotation.JsonTypeInfo.As.*;
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.*;
 
 /**
- * @author salaboy This class represent the Container instance information,
- *         which might describe how to talk with the application/image instance and
- *         which features are provided
+ * This interface represent the Runtime instance information.
+ * This includes the configuration which was used to create the Runtime
  */
 @JsonTypeInfo(use = CLASS, include = WRAPPER_OBJECT)
 public interface RuntimeInfo {
-
-    String getId();
-
-    String getName();
-
+    /*
+     * Get the RuntimeConfig used to build this runtime
+     * @return RuntimeConfig with the configuration used to create this Runtime
+     * @see RuntimeConfig
+    */
     RuntimeConfig getConfig();
 }

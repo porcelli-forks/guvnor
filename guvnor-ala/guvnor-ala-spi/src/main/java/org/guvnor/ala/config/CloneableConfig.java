@@ -16,7 +16,17 @@
 
 package org.guvnor.ala.config;
 
+/*
+ * Base interface for Clonable configurations. Use this interface if you are planning
+ *  to build this configuration using variable interpolation and this configuration needs to 
+ *  be send over the wire.
+*/
+
 public interface CloneableConfig<T> {
     
+    /*
+     * Create new clone of the configuration
+     * @return the cloned type
+     */
     T asNewClone( T origin );
 }

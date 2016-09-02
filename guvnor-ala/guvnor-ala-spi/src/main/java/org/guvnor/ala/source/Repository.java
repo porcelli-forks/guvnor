@@ -20,28 +20,42 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.As.*;
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.*;
+import org.guvnor.ala.exceptions.SourcingException;
 
 /**
- * @author salaboy
- *         Type to represent a Source Code Repository
+ * Type to represent a Source Code Repository
  */
-@JsonTypeInfo(use = CLASS, include = WRAPPER_OBJECT)
+@JsonTypeInfo( use = CLASS, include = WRAPPER_OBJECT )
 public interface Repository {
 
+    /*
+     * Get the Repository Id
+     * @return String with the repository id
+    */
     String getId();
 
+    /*
+     * Get the Repository Name
+     * @return String with the repository name
+    */
     String getName();
 
-    Source getSource();
+    /*
+    * Retrieve the source code from a Repository
+    * @return a Souce with the path to the retrieved source code
+    * @see Source
+     */
+    Source getSource() throws SourcingException;
 
     /*
     * Retrieve the source code from a Repository
     * returns the location (path) of the obtained code
     * @throws SourcingException if the repository cannot  be located or the code cannot be retrieved
-    * @param repository a source code Repository to use as Source for our projects
-    * @return a String with the path to the retrieved source code
-    * @see Repository
-    */
+    * @param String root path 
+    * @param String... path inside the repository where the Source can be located
+    * @return the Source from the specified repository path
+    * @see Source
+     */
     Source getSource( final String root,
-                      final String... path );
+            final String... path ) ;
 }

@@ -20,12 +20,28 @@ import java.util.List;
 
 import org.guvnor.ala.pipeline.Pipeline;
 
+/*
+ * Represents the PipelineRegistry where all the Pipelines are registered
+*/
 public interface PipelineRegistry {
 
+    /*
+     * Register a Pipeline
+     * @param Pipeline the pipeline to be registered
+    */
     void registerPipeline( Pipeline pipeline );
 
+    /*
+     * Get Pipeline by Name
+     * @param String pipelineId 
+     * @return the selected Pipeline
+    */
     Pipeline getPipelineByName( String pipelineId );
 
+     /*
+     * Get All the registered Pipelines
+     * @return List<Pipeline> with all the available pipelines. 
+    */
     List<Pipeline> getAllPipelines();
 
 }

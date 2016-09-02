@@ -16,6 +16,10 @@
 
 package org.guvnor.ala.exceptions;
 
+/**
+ * ProvisioningException to be used in different Provisioning mechanisms
+ * implementations.
+ */
 public class ProvisioningException extends RuntimeException {
 
     public ProvisioningException( String message ) {

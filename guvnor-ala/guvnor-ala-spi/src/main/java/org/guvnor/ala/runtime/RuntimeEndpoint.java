@@ -22,14 +22,28 @@ import static com.fasterxml.jackson.annotation.JsonTypeInfo.As.*;
 import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.*;
 
 /**
- * This interface represent the Runtime Endpoint
+ * This interface represent the Runtime Endpoint, meaning the endpoint that 
+ *  can be used to interact against this Runtime
  */
 @JsonTypeInfo(use = CLASS, include = WRAPPER_OBJECT)
 public interface RuntimeEndpoint {
 
+    /*
+     * Get the Runtime Endpoint host
+     * @return String with the host
+    */
     String getHost();
 
+    /*
+     * Get the Runtime Endpoint port
+     * @return int with the port number
+    */
     int getPort();
 
+    /*
+     * Get the Runtime Endpoint context
+     * @return String with the application context 
+     *   (if multiple applications are hosted on the same host:port)
+    */
     String getContext();
 }

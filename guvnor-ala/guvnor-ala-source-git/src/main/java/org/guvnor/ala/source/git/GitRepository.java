@@ -19,6 +19,7 @@ package org.guvnor.ala.source.git;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import org.guvnor.ala.exceptions.SourcingException;
 
 import org.uberfire.commons.config.ConfigProperties;
 import org.uberfire.java.nio.file.FileSystem;
@@ -44,12 +45,12 @@ public class GitRepository implements Repository {
     private FileSystem fileSystem = null;
 
     public GitRepository( final Host host,
-                          final String id,
-                          final String name,
-                          final URI uri,
-                          final GitCredentials credentials,
-                          final Map<String, String> env,
-                          final ConfigProperties config ) {
+            final String id,
+            final String name,
+            final URI uri,
+            final GitCredentials credentials,
+            final Map<String, String> env,
+            final ConfigProperties config ) {
         this.host = checkNotNull( "host", host );
         this.id = checkNotEmpty( "id", id );
         this.name = checkNotEmpty( "name", name );
@@ -80,23 +81,25 @@ public class GitRepository implements Repository {
 
     @Override
     public Source getSource( final String _root,
-                             final String... _path ) {
+            final String... _path ) {
         if ( fileSystem == null ) {
             final URI fsURI = URI.create( "git://" + name );
             try {
-                fileSystem = FileSystems.newFileSystem( fsURI, new HashMap<String, Object>( env ) {{
-                    putIfAbsent( "origin", uri.toString() );
-                    putIfAbsent( "out-dir", bareRepoDir );
-                    if ( credentials.getUser() != null ) {
-                        putIfAbsent( "username", credentials.getUser() );
-                        putIfAbsent( "password", credentials.getPassw() );
+                fileSystem = FileSystems.newFileSystem( fsURI, new HashMap<String, Object>( env ) {
+                    {
+                        putIfAbsent( "origin", uri.toString() );
+                        putIfAbsent( "out-dir", bareRepoDir );
+                        if ( credentials.getUser() != null ) {
+                            putIfAbsent( "username", credentials.getUser() );
+                            putIfAbsent( "password", credentials.getPassw() );
+                        }
                     }
-                }} );
+                } );
             } catch ( FileSystemAlreadyExistsException fsae ) {
                 try {
                     fileSystem = FileSystems.getFileSystem( fsURI );
                 } catch ( final Exception ex ) {
-                    throw new RuntimeException( ex );
+                    throw new SourcingException( "Error Getting Source", ex );
                 }
             }
         }

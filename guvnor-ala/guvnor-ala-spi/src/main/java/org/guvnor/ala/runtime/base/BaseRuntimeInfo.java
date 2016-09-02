@@ -19,31 +19,19 @@ package org.guvnor.ala.runtime.base;
 import org.guvnor.ala.config.RuntimeConfig;
 import org.guvnor.ala.runtime.RuntimeInfo;
 
+/*
+ * BaseRuntimeInfo implementation to be extended by each Runtime Provider
+*/
 public class BaseRuntimeInfo implements RuntimeInfo {
 
-    private String id;
-    private String name;
     private RuntimeConfig config;
 
     public BaseRuntimeInfo() {
     }
 
-    public BaseRuntimeInfo( String id,
-            String name,
-            RuntimeConfig config ) {
-        this.id = id;
-        this.name = name;
+    public BaseRuntimeInfo( RuntimeConfig config ) {
+
         this.config = config;
-    }
-
-    @Override
-    public String getId() {
-        return id;
-    }
-
-    @Override
-    public String getName() {
-        return name;
     }
 
     @Override
@@ -53,7 +41,7 @@ public class BaseRuntimeInfo implements RuntimeInfo {
 
     @Override
     public String toString() {
-        return "RuntimeInfo{" + "id=" + id + ", name=" + name + ", config=" + config + '}';
+        return "RuntimeInfo{ config=" + config + '}';
     }
 
 }

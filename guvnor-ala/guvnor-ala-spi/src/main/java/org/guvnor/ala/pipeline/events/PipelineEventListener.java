@@ -16,13 +16,17 @@
 
 package org.guvnor.ala.pipeline.events;
 
-public interface PipelineEventHandler {
+public interface PipelineEventListener {
 
-    public void beforePipelineExecution( BeforePipelineExecutionEvent bpee );
+    void beforePipelineExecution( final BeforePipelineExecutionEvent bpee );
 
-    public void afterPipelineExecution( AfterPipelineExecutionEvent apee );
+    void afterPipelineExecution( final AfterPipelineExecutionEvent apee );
 
-    public void beforeStageExecution( BeforeStageExecutionEvent bsee );
+    void beforeStageExecution( final BeforeStageExecutionEvent bsee );
 
-    public void afterStageExecution( AfterStageExecutionEvent asee );
+    void onStageError( final OnErrorStageExecutionEvent bsee );
+
+    void afterStageExecution( final AfterStageExecutionEvent asee );
+
+    void onPipelineError( final OnErrorPipelineExecutionEvent apee );
 }

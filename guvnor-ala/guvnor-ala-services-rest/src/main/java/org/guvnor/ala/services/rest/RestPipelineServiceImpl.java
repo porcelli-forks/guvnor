@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Consumer;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Any;
@@ -31,11 +32,12 @@ import org.guvnor.ala.pipeline.Input;
 import org.guvnor.ala.pipeline.Pipeline;
 import org.guvnor.ala.pipeline.PipelineConfig;
 import org.guvnor.ala.pipeline.PipelineFactory;
-import org.guvnor.ala.pipeline.events.PipelineEventHandler;
+import org.guvnor.ala.pipeline.events.PipelineEventListener;
 import org.guvnor.ala.pipeline.execution.PipelineExecutor;
 import org.guvnor.ala.registry.BuildRegistry;
 import org.guvnor.ala.registry.PipelineRegistry;
 import org.guvnor.ala.registry.SourceRegistry;
+import org.guvnor.ala.runtime.Runtime;
 import org.guvnor.ala.services.api.PipelineService;
 import org.guvnor.ala.services.api.itemlist.PipelineConfigsList;
 import org.guvnor.ala.services.exceptions.BusinessException;
@@ -61,7 +63,9 @@ public class RestPipelineServiceImpl implements PipelineService {
 
     @Inject
     @Any
-    private Instance<PipelineEventHandler> eventHandlers;
+    private Instance<PipelineEventListener> _eventListeners;
+
+    private PipelineEventListener[] eventListeners;
 
     @PostConstruct
     public void init() {
@@ -72,12 +76,17 @@ public class RestPipelineServiceImpl implements PipelineService {
             configs.add( configExecutor );
         }
         executor.init( configs );
+        final Collection<PipelineEventListener> eventListeners = new ArrayList<>();
+        for ( PipelineEventListener eventListener : _eventListeners ) {
+            eventListeners.add( eventListener );
+        }
+        this.eventListeners = eventListeners.toArray( new PipelineEventListener[]{} );
     }
 
     @Override
     public PipelineConfigsList getAllPipelineConfigs() throws BusinessException {
-        List<PipelineConfig> configs = new ArrayList<>();
-        pipelineRegistry.getAllPipelines().stream().forEach( (p) -> {
+        final List<PipelineConfig> configs = new ArrayList<>();
+        pipelineRegistry.getAllPipelines().stream().forEach( ( p ) -> {
             configs.add( p.getConfig() );
         } );
         return new PipelineConfigsList( configs );
@@ -91,9 +100,13 @@ public class RestPipelineServiceImpl implements PipelineService {
     }
 
     @Override
-    public void runPipeline( final String name,  final Input input) throws BusinessException {
-        Pipeline pipe = pipelineRegistry.getPipelineByName( name );
-        executor.execute( input, pipe, (org.guvnor.ala.runtime.Runtime b) -> System.out.println( b ) );
+    public void runPipeline( final String name,
+                             final Input input ) throws BusinessException {
+        final Pipeline pipe = pipelineRegistry.getPipelineByName( name );
+        executor.execute( input,
+                          pipe,
+                          (Consumer<Runtime>) System.out::println,
+                          eventListeners );
 
     }
 

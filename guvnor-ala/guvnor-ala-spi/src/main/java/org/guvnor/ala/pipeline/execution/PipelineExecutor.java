@@ -29,6 +29,13 @@ import org.guvnor.ala.pipeline.FunctionConfigExecutor;
 import org.guvnor.ala.pipeline.Input;
 import org.guvnor.ala.pipeline.Pipeline;
 import org.guvnor.ala.pipeline.Stage;
+import org.guvnor.ala.pipeline.events.AfterPipelineExecutionEvent;
+import org.guvnor.ala.pipeline.events.AfterStageExecutionEvent;
+import org.guvnor.ala.pipeline.events.BeforePipelineExecutionEvent;
+import org.guvnor.ala.pipeline.events.BeforeStageExecutionEvent;
+import org.guvnor.ala.pipeline.events.OnErrorPipelineExecutionEvent;
+import org.guvnor.ala.pipeline.events.OnErrorStageExecutionEvent;
+import org.guvnor.ala.pipeline.events.PipelineEventListener;
 
 import static org.guvnor.ala.util.VariableInterpolation.*;
 
@@ -54,40 +61,49 @@ public class PipelineExecutor {
     }
 
     public <T> void execute( final Input input,
-            final Pipeline pipeline,
-            final Consumer<T> callback ) {
+                             final Pipeline pipeline,
+                             final Consumer<T> callback,
+                             final PipelineEventListener... eventListeners ) {
         final PipelineContext context = new PipelineContext( pipeline );
         context.start( input );
         context.pushCallback( callback );
-        continuePipeline( context );
+        propagateEvent( new BeforePipelineExecutionEvent( pipeline ), eventListeners );
+        continuePipeline( context, eventListeners );
+        propagateEvent( new AfterPipelineExecutionEvent( pipeline ), eventListeners );
     }
 
-    private void continuePipeline( final PipelineContext context ) {
+    private void continuePipeline( final PipelineContext context,
+                                   final PipelineEventListener... eventListeners ) {
         while ( !context.isFinished() ) {
             final Stage<Object, ?> stage = getCurrentStage( context );
             final Object newInput = pollOutput( context );
 
             try {
+                propagateEvent( new BeforeStageExecutionEvent( context.getPipeline(), stage ), eventListeners );
                 stage.execute( newInput, output -> {
                     final ConfigExecutor executor = resolve( output.getClass() );
                     if ( output instanceof ContextAware ) {
-                        ( ( ContextAware ) output ).setContext( Collections.unmodifiableMap( context.getValues() ) );
+                        ( (ContextAware) output ).setContext( Collections.unmodifiableMap( context.getValues() ) );
                     }
                     final Object newOutput = interpolate( context.getValues(), output );
                     context.getValues().put( executor.inputId(), newOutput );
                     if ( executor instanceof BiFunctionConfigExecutor ) {
-                        final Optional result = ( Optional ) ( ( BiFunctionConfigExecutor ) executor ).apply( newInput, newOutput );
+                        final Optional result = (Optional) ( (BiFunctionConfigExecutor) executor ).apply( newInput, newOutput );
                         context.pushOutput( executor.outputId(), result.get() );
                     } else if ( executor instanceof FunctionConfigExecutor ) {
-                        final Optional result = ( Optional ) ( ( FunctionConfigExecutor ) executor ).apply( newOutput );
+                        final Optional result = (Optional) ( (FunctionConfigExecutor) executor ).apply( newOutput );
                         context.pushOutput( executor.outputId(), result.get() );
                     }
+
+                    propagateEvent( new AfterStageExecutionEvent( context.getPipeline(), stage ), eventListeners );
 
                     continuePipeline( context );
                 } );
             } catch ( final Throwable t ) {
-                t.printStackTrace();
-                throw new RuntimeException( "An error occurred while executing the " + ( stage == null ? "null" : stage.getName() ) + " stage.", t );
+                final RuntimeException exception = new RuntimeException( "An error occurred while executing the " + ( stage == null ? "null" : stage.getName() ) + " stage.", t );
+                propagateEvent( new OnErrorStageExecutionEvent( context.getPipeline(), stage, exception ), eventListeners );
+                propagateEvent( new OnErrorPipelineExecutionEvent( context.getPipeline(), stage, exception ), eventListeners );
+                throw exception;
             }
             return;
         }
@@ -122,4 +138,48 @@ public class PipelineExecutor {
                 .getCurrentStage()
                 .orElseThrow( () -> new IllegalStateException( "There was not current stage even though the process has not finished." ) );
     }
+
+    private void propagateEvent( final BeforePipelineExecutionEvent beforePipelineExecutionEvent,
+                                 final PipelineEventListener... eventListeners ) {
+        for ( final PipelineEventListener eventListener : eventListeners ) {
+            eventListener.beforePipelineExecution( beforePipelineExecutionEvent );
+        }
+    }
+
+    private void propagateEvent( final BeforeStageExecutionEvent beforeStageExecutionEvent,
+                                 final PipelineEventListener... eventListeners ) {
+        for ( final PipelineEventListener eventListener : eventListeners ) {
+            eventListener.beforeStageExecution( beforeStageExecutionEvent );
+        }
+    }
+
+    private void propagateEvent( final AfterStageExecutionEvent afterStageExecutionEvent,
+                                 final PipelineEventListener... eventListeners ) {
+        for ( final PipelineEventListener eventListener : eventListeners ) {
+            eventListener.afterStageExecution( afterStageExecutionEvent );
+        }
+    }
+
+    private void propagateEvent( final OnErrorStageExecutionEvent onErrorStageExecutionEvent,
+                                 final PipelineEventListener... eventListeners ) {
+        for ( final PipelineEventListener eventListener : eventListeners ) {
+            eventListener.onStageError( onErrorStageExecutionEvent );
+        }
+    }
+
+    private void propagateEvent( final OnErrorPipelineExecutionEvent onErrorPipelineExecutionEvent,
+                                 final PipelineEventListener... eventListeners ) {
+        for ( final PipelineEventListener eventListener : eventListeners ) {
+            eventListener.onPipelineError( onErrorPipelineExecutionEvent );
+        }
+    }
+
+    private void propagateEvent( final AfterPipelineExecutionEvent afterPipelineExecutionEvent,
+                                 final PipelineEventListener... eventListeners ) {
+        for ( final PipelineEventListener eventListener : eventListeners ) {
+            eventListener.afterPipelineExecution( afterPipelineExecutionEvent );
+        }
+
+    }
+
 }

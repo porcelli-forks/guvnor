@@ -36,19 +36,20 @@ import org.guvnor.ala.pipeline.Stage;
 public class PipelineContext {
 
     private final Iterator<Stage> iterator;
-    private Optional<Object> initialInput = Optional.empty();
+    private final Pipeline pipeline;
     private Optional<Object> lastOutput = Optional.empty();
     private Optional<Stage<Object, ?>> currentStage = Optional.empty();
     private Map<String, Object> values = new HashMap<>();
 
     private final Deque<Consumer<?>> callbacks = new LinkedList<>();
 
-    PipelineContext( final Pipeline pipeline ) {
-        this.iterator = pipeline.getStages().iterator();
-    }
-
     Optional<Object> pollOutput() {
         return lastOutput;
+    }
+
+    PipelineContext( final Pipeline pipeline ) {
+        this.pipeline = pipeline;
+        this.iterator = pipeline.getStages().iterator();
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -68,8 +69,7 @@ public class PipelineContext {
             throw new RuntimeException( "Process has already been started." );
         }
 
-        this.initialInput = Optional.of( initialInput );
-        this.values.put( "input", initialInput );
+        this.values.put( "input", Optional.of( initialInput ) );
         if ( iterator.hasNext() ) {
             currentStage = Optional.of( iterator.next() );
         } else {
@@ -90,21 +90,25 @@ public class PipelineContext {
         return currentStage;
     }
 
-    public void pushCallback( final Consumer<?> callback ) {
+    void pushCallback( final Consumer<?> callback ) {
         callbacks.push( callback );
     }
 
-    public boolean hasCallbacks() {
+    boolean hasCallbacks() {
         return !callbacks.isEmpty();
     }
 
-    public void applyCallbackAndPop( final Object value ) {
+    void applyCallbackAndPop( final Object value ) {
         final Consumer callback = callbacks.peek();
         callback.accept( value );
         callbacks.pop();
     }
 
-    public Map<String, Object> getValues() {
+    Pipeline getPipeline() {
+        return pipeline;
+    }
+
+    Map<String, Object> getValues() {
         return values;
     }
 }

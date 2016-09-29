@@ -160,7 +160,7 @@ public class WildflyExecutorTest {
             
         }}, pipe, System.out::println);
         
-         List<Runtime> allRuntimes = runtimeRegistry.getRuntimes(0, 10, "", true);
+        List<Runtime> allRuntimes = runtimeRegistry.getRuntimes(0, 10, "", true);
 
         assertEquals( 1, allRuntimes.size() );
 

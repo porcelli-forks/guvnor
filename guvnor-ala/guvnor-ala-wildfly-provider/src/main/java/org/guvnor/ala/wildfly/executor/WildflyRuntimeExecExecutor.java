@@ -36,9 +36,9 @@ public class WildflyRuntimeExecExecutor<T extends WildflyRuntimeConfiguration> i
 
     @Inject
     public WildflyRuntimeExecExecutor( final RuntimeRegistry runtimeRegistry,
-            final WildflyAccessInterface docker ) {
+            final WildflyAccessInterface wildfly ) {
         this.runtimeRegistry = runtimeRegistry;
-        this.wildfly = docker;
+        this.wildfly = wildfly;
     }
 
     @Override
@@ -64,9 +64,13 @@ public class WildflyRuntimeExecExecutor<T extends WildflyRuntimeConfiguration> i
         }
 
         final String id = file.getName();
-
-        return Optional.of( new WildflyRuntime( id, runtimeConfig, wildflyProvider, 
-                new WildflyRuntimeEndpoint(), new WildflyRuntimeInfo(), new WildflyRuntimeState() ) );
+        String appContext = id.substring( 0, id.lastIndexOf( ".war"));
+        WildflyRuntimeEndpoint endpoint = new WildflyRuntimeEndpoint();
+        endpoint.setHost( wildfly.getWildflyClient( wildflyProvider ).getHost() );
+        endpoint.setPort( wildfly.getWildflyClient( wildflyProvider ).getPort() );
+        endpoint.setContext( appContext );
+        return Optional.of( new WildflyRuntime( id, runtimeConfig, wildflyProvider,
+                endpoint, new WildflyRuntimeInfo(), new WildflyRuntimeState() ) );
     }
 
     @Override

@@ -63,14 +63,16 @@ public class WildflyClient {
     private final String user;
     private final String password;
     private final String host;
+    private final int port;
     private final int managementPort;
 
-    public WildflyClient( String providerName, String user, String password, String host, int managementPort ) {
+    public WildflyClient( String providerName, String user, String password, String host, int port, int managementPort ) {
         this.providerName = providerName;
         this.user = user;
         this.password = password;
         this.host = host;
         this.managementPort = managementPort;
+        this.port = port;
     }
 
     /*
@@ -339,6 +341,10 @@ public class WildflyClient {
         return host;
     }
 
+    public int getPort() {
+        return port;
+    }
+    
     public int getManagementPort() {
         return managementPort;
     }

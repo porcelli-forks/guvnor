@@ -69,7 +69,6 @@ public class PipelineEndpointsTestIT {
     }
 
     @Test
-
     public void checkService() {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target( APP_URL );

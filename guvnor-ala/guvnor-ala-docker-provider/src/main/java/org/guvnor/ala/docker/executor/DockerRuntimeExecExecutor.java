@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import com.spotify.docker.client.DockerException;
 import com.spotify.docker.client.messages.ContainerConfig;
 import com.spotify.docker.client.messages.ContainerCreation;
+import com.spotify.docker.client.messages.ContainerInfo;
 import com.spotify.docker.client.messages.HostConfig;
 import com.spotify.docker.client.messages.PortBinding;
 import org.guvnor.ala.config.Config;
@@ -108,6 +109,7 @@ public class DockerRuntimeExecExecutor<T extends DockerRuntimeConfig> implements
         final ContainerCreation creation;
         try {
             creation = docker.getDockerClient( runtimeConfig.getProviderId() ).createContainer( containerConfig );
+            docker.getDockerClient( runtimeConfig.getProviderId() ).startContainer( creation.id() );
         } catch ( DockerException | InterruptedException ex ) {
             LOG.error( ex.getMessage(), ex );
             throw new ProvisioningException( "Error Creating Docker Container with image: " + runtimeConfig.getImage() + "with error: " + ex.getMessage(), ex );
@@ -115,9 +117,20 @@ public class DockerRuntimeExecExecutor<T extends DockerRuntimeConfig> implements
 
         final String id = creation.id();
         String shortId = id.substring( 0, 12 );
-
-        return Optional.of( new DockerRuntime( shortId, runtimeConfig, dockerProvider, 
-                        new DockerRuntimeEndpoint(), new DockerRuntimeInfo(), new DockerRuntimeState() ) );
+        String host = "";
+        ContainerInfo containerInfo;
+        try {
+            containerInfo = docker.getDockerClient( runtimeConfig.getProviderId() ).inspectContainer( id );
+            host = docker.getDockerClient( runtimeConfig.getProviderId() ).getHost();
+        } catch ( DockerException | InterruptedException ex ) {
+            throw new ProvisioningException( "Error Getting Docker Container info: " + id + "with error: " + ex.getMessage(), ex );
+        }
+        DockerRuntimeEndpoint dockerRuntimeEndpoint = new DockerRuntimeEndpoint();
+        dockerRuntimeEndpoint.setHost( host );
+        dockerRuntimeEndpoint.setPort( Integer.valueOf( runtimeConfig.getPort() ) );
+        dockerRuntimeEndpoint.setContext( "" );
+        return Optional.of( new DockerRuntime( shortId, runtimeConfig, dockerProvider,
+                dockerRuntimeEndpoint, new DockerRuntimeInfo(), new DockerRuntimeState() ) );
     }
 
     @Override

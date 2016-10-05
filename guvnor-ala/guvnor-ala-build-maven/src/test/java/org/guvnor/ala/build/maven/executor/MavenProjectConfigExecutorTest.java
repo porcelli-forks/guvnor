@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016 Red Hat, Inc. and/or its affiliates.
  *
@@ -88,6 +89,7 @@ public class MavenProjectConfigExecutorTest {
         executor.execute( new Input() {
             {
                 put( "repo-name", "drools-workshop" );
+                put( "create-repo", "true" );
                 put( "branch", "master" );
                 put( "out-dir", tempPath.getAbsolutePath() );
                 put( "origin", "https://github.com/salaboy/drools-workshop" );
@@ -114,6 +116,12 @@ public class MavenProjectConfigExecutorTest {
             this.context = context;
         }
 
+        @Override
+        public String getCreateRepo() {
+            return ( ( Map ) context.get( "input" ) ).get( "create-repo" ).toString();
+        }
+
+        
         @Override
         public String getRepoName() {
             return ( ( Map ) context.get( "input" ) ).get( "repo-name" ).toString();

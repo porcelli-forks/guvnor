@@ -148,6 +148,7 @@ public class WildflyExecutorTest {
        
         executor.execute( new Input() {{
             put( "repo-name", "drools-workshop" );
+            put( "create-repo", "true" );
             put( "branch", "master" );
             put( "out-dir", tempPath.getAbsolutePath() );
             put( "origin", "https://github.com/salaboy/drools-workshop" );

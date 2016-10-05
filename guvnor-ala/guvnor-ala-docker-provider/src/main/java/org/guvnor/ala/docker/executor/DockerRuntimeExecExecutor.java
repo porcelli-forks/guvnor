@@ -29,6 +29,7 @@ import com.spotify.docker.client.messages.ContainerCreation;
 import com.spotify.docker.client.messages.ContainerInfo;
 import com.spotify.docker.client.messages.HostConfig;
 import com.spotify.docker.client.messages.PortBinding;
+import java.util.Date;
 import org.guvnor.ala.config.Config;
 import org.guvnor.ala.config.RuntimeConfig;
 import org.guvnor.ala.docker.access.DockerAccessInterface;
@@ -130,7 +131,7 @@ public class DockerRuntimeExecExecutor<T extends DockerRuntimeConfig> implements
         dockerRuntimeEndpoint.setPort( Integer.valueOf( runtimeConfig.getPort() ) );
         dockerRuntimeEndpoint.setContext( "" );
         return Optional.of( new DockerRuntime( shortId, runtimeConfig, dockerProvider,
-                dockerRuntimeEndpoint, new DockerRuntimeInfo(), new DockerRuntimeState() ) );
+                dockerRuntimeEndpoint, new DockerRuntimeInfo(), new DockerRuntimeState("Running", new Date().toString()) ) );
     }
 
     @Override

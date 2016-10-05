@@ -14,6 +14,15 @@ public interface GitConfig extends SourceConfig {
     default String getRepoName() {
         return "${input.repo-name}";
     }
+    
+     /*
+     * Get String to find out if we need to create the repo or not
+     * @return String true/false
+     *  resolve the expresion ${input.create-repo} from the Pipeline Input map
+    */
+    default String getCreateRepo() {
+        return "${input.create-repo}";
+    }
 
     /*
      * Get the Origin address

@@ -83,6 +83,7 @@ public class MavenCliOutputTest {
         new Thread( () -> {
             List<String> goals = new ArrayList<>();
             goals.add( "package" );
+            goals.add("-DfailIfNoTests=false");
             final InputStream pomStream = org.uberfire.java.nio.file.Files.newInputStream( source.getPath().resolve( "drools-webapp-example" ).resolve( "pom.xml" ) );
             MavenProject project = MavenProjectLoader.parseMavenPom( pomStream );
 

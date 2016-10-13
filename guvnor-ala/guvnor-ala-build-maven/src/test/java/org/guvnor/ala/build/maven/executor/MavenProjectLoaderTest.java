@@ -16,11 +16,9 @@
 
 package org.guvnor.ala.build.maven.executor;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.HashMap;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.project.MavenProject;
@@ -63,53 +61,48 @@ public class MavenProjectLoaderTest {
         final Source source = repository.getSource( "master" );
         assertNotNull( source );
         InputStream pomStream = Files.newInputStream( source.getPath().resolve( "drools-webapp-example" ).resolve( "pom.xml" ) );
-//        String result = getStringFromInputStream( pomStream );
-//
-//        System.out.println( result );
-//        System.out.println( "Done" );
+
         MavenProject project = MavenProjectLoader.parseMavenPom( pomStream );
 
         assertNotNull( project );
         System.out.println( "Project " + project );
         pomStream = Files.newInputStream( source.getPath().resolve( "drools-webapp-example" ).resolve( "pom.xml" ) );
-//        result = getStringFromInputStream( pomStream );
+
         project = MavenProjectLoader.parseMavenPom( pomStream );
 
         assertNotNull( project );
         System.out.println( "Project " + project );
-// System.out.println( result );
-//        System.out.println( "Done" );
 
     }
 
-    // convert InputStream to String
-    private static String getStringFromInputStream( InputStream is ) {
-
-        BufferedReader br = null;
-        StringBuilder sb = new StringBuilder();
-
-        String line;
-        try {
-
-            br = new BufferedReader( new InputStreamReader( is ) );
-            while ( ( line = br.readLine() ) != null ) {
-                sb.append( line );
-            }
-
-        } catch ( IOException e ) {
-            e.printStackTrace();
-        } finally {
-            if ( br != null ) {
-                try {
-                    br.close();
-                } catch ( IOException e ) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        return sb.toString();
-
-    }
+//    // convert InputStream to String
+//    private static String getStringFromInputStream( InputStream is ) {
+//
+//        BufferedReader br = null;
+//        StringBuilder sb = new StringBuilder();
+//
+//        String line;
+//        try {
+//
+//            br = new BufferedReader( new InputStreamReader( is ) );
+//            while ( ( line = br.readLine() ) != null ) {
+//                sb.append( line );
+//            }
+//
+//        } catch ( IOException e ) {
+//            e.printStackTrace();
+//        } finally {
+//            if ( br != null ) {
+//                try {
+//                    br.close();
+//                } catch ( IOException e ) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
+//
+//        return sb.toString();
+//
+//    }
 
 }

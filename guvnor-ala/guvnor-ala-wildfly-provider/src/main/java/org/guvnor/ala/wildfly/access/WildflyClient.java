@@ -308,11 +308,17 @@ public class WildflyClient {
             // contains an array of dataset objects
             if ( element.isJsonObject() ) {
                 JsonObject outcome = element.getAsJsonObject();
-                JsonObject result = outcome.get( "result" ).getAsJsonObject();
-                String enabled = result.get( "enabled" ).getAsString();
+                JsonElement resultElement = outcome.get( "result" );
+                String enabled = "false";
+                if ( resultElement != null ) {
+                    JsonObject result = resultElement.getAsJsonObject();
+                    enabled = result.get( "enabled" ).getAsString();
+                }
                 String state = "Stopped";
                 if ( enabled.equals( "true" ) ) {
                     state = "Running";
+                } else {
+                    state = "NA";
                 }
                 return new WildflyAppState( state, new Date() );
             }
@@ -321,7 +327,7 @@ public class WildflyClient {
             LOG.error( "Error Getting App State : " + ex.getMessage(), ex );
             throw new WildflyClientException( "Error Getting App State : " + ex.getMessage(), ex );
         }
-        return null;
+        return new WildflyAppState( "NA", new Date() );
 
     }
 
@@ -344,7 +350,7 @@ public class WildflyClient {
     public int getPort() {
         return port;
     }
-    
+
     public int getManagementPort() {
         return managementPort;
     }

@@ -14,7 +14,7 @@
   <logger name="org.guvnor" level="INFO"/>
   <logger name="org.guvnor.ala" level="INFO"/>
 
-  <root level="WARN">
+  <root level="INFO">
     <appender-ref ref="consoleAppender" />
   </root>
 

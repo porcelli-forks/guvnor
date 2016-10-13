@@ -43,11 +43,11 @@ public class MavenBuildExecConfigExecutor implements BiFunctionConfigExecutor<Ma
 
     @Override
     public Optional<BinaryConfig> apply( final MavenBuild mavenBuild,
-                                         final MavenBuildExecConfig mavenBuildExecConfig ) {
+            final MavenBuildExecConfig mavenBuildExecConfig ) {
         int result = build( mavenBuild.getProject(), mavenBuild.getGoals() );
-        if(result != 0){
-            throw new RuntimeException("Cannot build Maven Project. Look at the previous logs for more information.");
-            
+        if ( result != 0 ) {
+            throw new RuntimeException( "Cannot build Maven Project. Look at the previous logs for more information." );
+
         }
         final MavenBinary binary = new MavenBinaryImpl( mavenBuild.getProject() );
         buildRegistry.registerBinary( binary );
@@ -69,17 +69,16 @@ public class MavenBuildExecConfigExecutor implements BiFunctionConfigExecutor<Ma
         return "maven-exec-config";
     }
 
-
     public int build( final Project project,
-                      final List<String> goals ) throws BuildException {
+            final List<String> goals ) throws BuildException {
         return executeMaven( project, goals.toArray( new String[]{} ) );
     }
 
     private int executeMaven( final Project project,
-                              final String... goals ) {
+            final String... goals ) {
         return new MavenCli().doMain( goals,
-                                      getRepositoryVisitor( project ).getProjectFolder().getAbsolutePath(),
-                                      System.err, System.err );
+                getRepositoryVisitor( project ).getProjectFolder().getAbsolutePath(),
+                System.out, System.out );
     }
 
     private RepositoryVisitor getRepositoryVisitor( final Project project ) {

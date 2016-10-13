@@ -23,5 +23,8 @@ import org.guvnor.ala.config.BuildConfig;
  * interface
  */
 public interface GWTCodeServerConfig extends BuildConfig {
-
+    
+    default String getBindAddress(){
+        return "${input.bindAddress}";
+    }
 }

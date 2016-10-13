@@ -15,46 +15,55 @@
  */
 package org.guvnor.ala.build.maven.executor.gwt;
 
+import java.io.BufferedReader;
 import java.io.File;
-import static java.util.Arrays.asList;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
+import javax.inject.Inject;
 
 import org.apache.maven.cli.MavenCli;
-import org.apache.mina.util.ConcurrentHashSet;
 import org.guvnor.ala.build.Project;
 import org.guvnor.ala.build.maven.config.gwt.GWTCodeServerMavenExecConfig;
-import org.guvnor.ala.build.maven.model.MavenBuild;
 import org.guvnor.ala.build.maven.util.RepositoryVisitor;
 import org.guvnor.ala.config.Config;
-import org.guvnor.ala.config.gwt.CodeServerPortHandle;
 import org.guvnor.ala.exceptions.BuildException;
-import org.guvnor.ala.pipeline.FunctionConfigExecutor;
+import org.guvnor.ala.pipeline.BiFunctionConfigExecutor;
 
-public class GWTCodeServerMavenExecConfigExecutor implements FunctionConfigExecutor<MavenBuild, MavenBuild> {
+import org.guvnor.ala.build.maven.model.MavenBuild;
+
+public class GWTCodeServerMavenExecConfigExecutor implements BiFunctionConfigExecutor<MavenBuild, GWTCodeServerMavenExecConfig, MavenBuild> {
 
     private static final String GWT_CODE_SERVER_PORT = "gwt.codeServerPort";
     private static final String GWT_CODE_SERVER_LAUNCHER_DIR = "gwt.codeServer.launcherDir";
-    private static final int CODE_SERVER_LOWEST_PORT = 50000;
-    private static final int CODE_SERVER_HIGHEST_PORT = 50100;
-    private final Set<Integer> leasedCodeServerPorts = new ConcurrentHashSet<Integer>();
-
-    public GWTCodeServerMavenExecConfigExecutor() {
+    private static final String GWT_CODE_SERVER_BIND_ADDRESS = "gwt.bindAddress";
+    private boolean isCodeServerReady = false;
+    private volatile Throwable error = null;
+    private GWTCodeServerPortLeaser leaser;
+    
+    @Inject
+    public GWTCodeServerMavenExecConfigExecutor( GWTCodeServerPortLeaser leaser ) {
+        this.leaser = leaser;
     }
 
     @Override
-    public Optional<MavenBuild> apply( final MavenBuild mavenBuild ) {
-        final File webappFolder = new File( getRepositoryVisitor( mavenBuild.getProject() ).getProjectFolder().getAbsolutePath(), "src/main/webapp" );
-        int result = build( mavenBuild.getProject(), asList( "gwt:run-codeserver",
-                "-D" + GWT_CODE_SERVER_LAUNCHER_DIR + "=" + webappFolder.getAbsolutePath(),
-                "-D" + GWT_CODE_SERVER_PORT + "=" + String.valueOf( getAvailableCodeServerPort().getPortNumber() ) ) );
-        if ( result != 0 ) {
-            throw new RuntimeException( "Cannot Start a GWT Code Server Look at the previous logs for more information." );
+    public Optional<MavenBuild> apply( final MavenBuild buildConfig,
+            final GWTCodeServerMavenExecConfig config ) {
+        final File webappFolder = new File( getRepositoryVisitor( buildConfig.getProject() ).getProjectFolder().getAbsolutePath(), "src/main/webapp" );
+        List<String> goals = new ArrayList<>();
+        goals.add( "gwt:run-codeserver" );
+        goals.add( "-D" + GWT_CODE_SERVER_LAUNCHER_DIR + "=" + webappFolder.getAbsolutePath() );
+        goals.add( "-D" + GWT_CODE_SERVER_PORT + "=" + String.valueOf( leaser.getAvailableCodeServerPort().getPortNumber() ) );
+        goals.add( "-D" + GWT_CODE_SERVER_BIND_ADDRESS + "=" + config.getBindAddress() );
 
-        }
+        build( buildConfig.getProject(), goals );
 
-        return Optional.of( mavenBuild );
+        return Optional.of( buildConfig );
     }
 
     @Override
@@ -72,59 +81,49 @@ public class GWTCodeServerMavenExecConfigExecutor implements FunctionConfigExecu
         return "gwt-codeserver-config";
     }
 
-    public int build( final Project project,
+    public void build( final Project project,
             final List<String> goals ) throws BuildException {
-        return executeMaven( project, goals.toArray( new String[]{} ) );
+        BufferedReader bufferedReader = null;
+        try {
+            PipedOutputStream baosOut = new PipedOutputStream();
+            PipedOutputStream baosErr = new PipedOutputStream();
+            final PrintStream out = new PrintStream( baosOut, true );
+            final PrintStream err = new PrintStream( baosErr, true );
+            new Thread( () -> {
+                executeMaven( project, out, err, goals.toArray( new String[]{} ) );
+            } ).start();
+            bufferedReader = new BufferedReader( new InputStreamReader( new PipedInputStream( baosOut ) ) );
+            String line;
+            StringBuilder sb = new StringBuilder();
+            while ( !( isCodeServerReady || error != null ) ) {
+                if ( ( line = bufferedReader.readLine() ) != null ) {
+                    sb.append( line ).append( "\n" );
+                    if ( line.contains( "The code server is ready at" ) ) {
+                        isCodeServerReady = true;
+                    }
+                }
+                //@TODO: send line to client
+            }
+
+        } catch ( IOException ex ) {
+            // MavenCli will close abruptly the pipe when the build process finishes, so we just swallow this exception.
+            ex.printStackTrace();
+        }
+
     }
 
-    private int executeMaven( final Project project,
+    private void executeMaven( final Project project, final PrintStream out, final PrintStream err,
             final String... goals ) {
-
-        return new MavenCli().doMain( goals,
+        new MavenCli().doMain( goals,
                 getRepositoryVisitor( project ).getProjectFolder().getAbsolutePath(),
-                System.err, System.err );
+                out, err );
+
     }
 
     private RepositoryVisitor getRepositoryVisitor( final Project project ) {
         return new RepositoryVisitor( project );
     }
 
-    private CodeServerPortHandle getAvailableCodeServerPort() {
-        return new CodeServerPortHandle() {
-
-            private Integer leasedPort = leaseAvailableCodeServerPort();
-
-            @Override
-            public void relinquishPort() {
-                leasedCodeServerPorts.remove( leasedPort );
-                leasedPort = null;
-            }
-
-            @Override
-            public Integer getPortNumber() {
-                if ( leasedPort != null ) {
-                    return leasedPort;
-                } else {
-                    throw new RuntimeException( "Cannot get port number after relinquishing." );
-                }
-            }
-        };
-    }
-
-    private synchronized Integer leaseAvailableCodeServerPort() {
-        Integer port = CODE_SERVER_LOWEST_PORT;
-
-        while ( port <= CODE_SERVER_HIGHEST_PORT && leasedCodeServerPorts.contains( port ) ) {
-            port++;
-        }
-
-        if ( port > CODE_SERVER_HIGHEST_PORT ) {
-            throw new RuntimeException( "All available code server ports are in use." );
-        }
-
-        leasedCodeServerPorts.add( port );
-
-        return port;
-    }
+    
 
 }

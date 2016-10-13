@@ -59,7 +59,7 @@ public class MavenProjectConfigExecutorTest {
 
     @Before
     public void setUp() throws IOException {
-        tempPath = Files.createTempDirectory( "xxx" ).toFile();
+        tempPath = Files.createTempDirectory( "yyy" ).toFile();
     }
 
     @After
@@ -82,13 +82,13 @@ public class MavenProjectConfigExecutorTest {
                 .andThen( buildConfig )
                 .andThen( buildExec ).buildAs( "my pipe" );
 
-        final PipelineExecutor executor = new PipelineExecutor( asList( new GitConfigExecutor( sourceRegistry ), 
-                                                                    new MavenProjectConfigExecutor( sourceRegistry ), 
-                                                                    new MavenBuildConfigExecutor(), 
-                                                                    new MavenBuildExecConfigExecutor( buildRegistry ) ) );
+        final PipelineExecutor executor = new PipelineExecutor( asList( new GitConfigExecutor( sourceRegistry ),
+                new MavenProjectConfigExecutor( sourceRegistry ),
+                new MavenBuildConfigExecutor(),
+                new MavenBuildExecConfigExecutor( buildRegistry ) ) );
         executor.execute( new Input() {
             {
-                put( "repo-name", "drools-workshop" );
+                put( "repo-name", "drools-workshop-pipe" );
                 put( "create-repo", "true" );
                 put( "branch", "master" );
                 put( "out-dir", tempPath.getAbsolutePath() );
@@ -104,6 +104,22 @@ public class MavenProjectConfigExecutorTest {
         assertEquals( 1, allProjects.size() );
         List<Binary> allBinaries = buildRegistry.getAllBinaries();
         assertEquals( 1, allBinaries.size() );
+
+        executor.execute( new Input() {
+            {
+                put( "repo-name", "drools-workshop-pipe" );
+                put( "branch", "master" );
+                put( "project-dir", "drools-webapp-example" );
+            }
+        }, pipe, (Binary b) -> System.out.println( b.getName() ) );
+
+        allRepositories = sourceRegistry.getAllRepositories();
+        assertEquals( 1, allRepositories.size() );
+        repo = allRepositories.get( 0 );
+        allProjects = sourceRegistry.getAllProjects( repo );
+        assertEquals( 2, allProjects.size() );
+        allBinaries = buildRegistry.getAllBinaries();
+        assertEquals( 2, allBinaries.size() );
     }
 
     static class MyGitConfig implements GitConfig,
@@ -118,10 +134,9 @@ public class MavenProjectConfigExecutorTest {
 
         @Override
         public String getCreateRepo() {
-            return ( ( Map ) context.get( "input" ) ).get( "create-repo" ).toString();
+            return ( ( ( Map ) context.get( "input" ) ).get( "create-repo" ) != null ) ? ( ( Map ) context.get( "input" ) ).get( "create-repo" ).toString() : "false";
         }
 
-        
         @Override
         public String getRepoName() {
             return ( ( Map ) context.get( "input" ) ).get( "repo-name" ).toString();

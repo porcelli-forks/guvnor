@@ -15,22 +15,24 @@
  */
 package org.guvnor.ala.build.maven.executor;
 
+import java.io.File;
 import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
 import javax.inject.Inject;
 
-import org.apache.maven.cli.MavenCli;
 import org.guvnor.ala.build.Project;
 import org.guvnor.ala.build.maven.config.MavenBuildExecConfig;
 import org.guvnor.ala.build.maven.model.MavenBinary;
 import org.guvnor.ala.build.maven.model.MavenBuild;
 import org.guvnor.ala.build.maven.model.impl.MavenBinaryImpl;
-import org.guvnor.ala.build.maven.util.RepositoryVisitor;
 import org.guvnor.ala.config.BinaryConfig;
 import org.guvnor.ala.config.Config;
 import org.guvnor.ala.exceptions.BuildException;
 import org.guvnor.ala.pipeline.BiFunctionConfigExecutor;
 import org.guvnor.ala.registry.BuildRegistry;
+
+import static org.guvnor.ala.build.maven.util.MavenBuildExecutor.*;
 
 public class MavenBuildExecConfigExecutor implements BiFunctionConfigExecutor<MavenBuild, MavenBuildExecConfig, BinaryConfig> {
 
@@ -43,8 +45,9 @@ public class MavenBuildExecConfigExecutor implements BiFunctionConfigExecutor<Ma
 
     @Override
     public Optional<BinaryConfig> apply( final MavenBuild mavenBuild,
-            final MavenBuildExecConfig mavenBuildExecConfig ) {
-        int result = build( mavenBuild.getProject(), mavenBuild.getGoals() );
+                                         final MavenBuildExecConfig mavenBuildExecConfig ) {
+
+        int result = build( mavenBuild.getProject(), mavenBuild.getGoals(), mavenBuild.getProperties() );
         if ( result != 0 ) {
             throw new RuntimeException( "Cannot build Maven Project. Look at the previous logs for more information." );
 
@@ -70,19 +73,11 @@ public class MavenBuildExecConfigExecutor implements BiFunctionConfigExecutor<Ma
     }
 
     public int build( final Project project,
-            final List<String> goals ) throws BuildException {
-        return executeMaven( project, goals.toArray( new String[]{} ) );
-    }
+                      final List<String> goals,
+                      final Properties properties ) throws BuildException {
+        final File pom = new File( getRepositoryVisitor( project ).getProjectFolder(), "pom.xml" );
 
-    private int executeMaven( final Project project,
-            final String... goals ) {
-        return new MavenCli().doMain( goals,
-                getRepositoryVisitor( project ).getProjectFolder().getAbsolutePath(),
-                System.out, System.out );
-    }
-
-    private RepositoryVisitor getRepositoryVisitor( final Project project ) {
-        return new RepositoryVisitor( project );
+        return executeMaven( pom, properties, goals.toArray( new String[]{} ) );
     }
 
 }

@@ -19,10 +19,12 @@ package org.guvnor.ala.build.maven.executor;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.guvnor.ala.build.Binary;
+import org.guvnor.ala.build.Project;
 import org.guvnor.ala.build.maven.config.impl.MavenBuildConfigImpl;
 import org.guvnor.ala.build.maven.config.impl.MavenBuildExecConfigImpl;
 import org.guvnor.ala.build.maven.config.impl.MavenProjectConfigImpl;
@@ -40,6 +42,7 @@ import org.guvnor.ala.registry.BuildRegistry;
 import org.guvnor.ala.registry.SourceRegistry;
 import org.guvnor.ala.registry.local.InMemoryBuildRegistry;
 import org.guvnor.ala.registry.local.InMemorySourceRegistry;
+import org.guvnor.ala.source.Repository;
 import org.guvnor.ala.source.git.config.GitConfig;
 import org.guvnor.ala.source.git.executor.GitConfigExecutor;
 import org.junit.After;
@@ -47,11 +50,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static java.util.Arrays.*;
-import java.util.List;
-import org.guvnor.ala.build.Project;
 import static org.guvnor.ala.pipeline.StageUtil.*;
-import org.guvnor.ala.source.Repository;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class MavenProjectConfigExecutorTest {
 
@@ -72,10 +72,10 @@ public class MavenProjectConfigExecutorTest {
         final SourceRegistry sourceRegistry = new InMemorySourceRegistry();
         final BuildRegistry buildRegistry = new InMemoryBuildRegistry();
 
-        final Stage<Input, SourceConfig> sourceConfig = config( "Git Source", (s) -> new MyGitConfig() );
-        final Stage<SourceConfig, ProjectConfig> projectConfig = config( "Maven Project", (s) -> new MavenProjectConfigImpl() );
-        final Stage<ProjectConfig, BuildConfig> buildConfig = config( "Maven Build Config", (s) -> new MavenBuildConfigImpl() );
-        final Stage<BuildConfig, BinaryConfig> buildExec = config( "Maven Build", (s) -> new MavenBuildExecConfigImpl() );
+        final Stage<Input, SourceConfig> sourceConfig = config( "Git Source", ( s ) -> new MyGitConfig() );
+        final Stage<SourceConfig, ProjectConfig> projectConfig = config( "Maven Project", ( s ) -> new MavenProjectConfigImpl() );
+        final Stage<ProjectConfig, BuildConfig> buildConfig = config( "Maven Build Config", ( s ) -> new MavenBuildConfigImpl() );
+        final Stage<BuildConfig, BinaryConfig> buildExec = config( "Maven Build", ( s ) -> new MavenBuildExecConfigImpl() );
         final Pipeline pipe = PipelineFactory
                 .startFrom( sourceConfig )
                 .andThen( projectConfig )
@@ -83,9 +83,9 @@ public class MavenProjectConfigExecutorTest {
                 .andThen( buildExec ).buildAs( "my pipe" );
 
         final PipelineExecutor executor = new PipelineExecutor( asList( new GitConfigExecutor( sourceRegistry ),
-                new MavenProjectConfigExecutor( sourceRegistry ),
-                new MavenBuildConfigExecutor(),
-                new MavenBuildExecConfigExecutor( buildRegistry ) ) );
+                                                                        new MavenProjectConfigExecutor( sourceRegistry ),
+                                                                        new MavenBuildConfigExecutor(),
+                                                                        new MavenBuildExecConfigExecutor( buildRegistry ) ) );
         executor.execute( new Input() {
             {
                 put( "repo-name", "drools-workshop-pipe" );
@@ -95,7 +95,7 @@ public class MavenProjectConfigExecutorTest {
                 put( "origin", "https://github.com/salaboy/drools-workshop" );
                 put( "project-dir", "drools-webapp-example" );
             }
-        }, pipe, (Binary b) -> System.out.println( b.getName() ) );
+        }, pipe, ( Binary b ) -> System.out.println( b.getName() ) );
 
         List<Repository> allRepositories = sourceRegistry.getAllRepositories();
         assertEquals( 1, allRepositories.size() );
@@ -111,7 +111,7 @@ public class MavenProjectConfigExecutorTest {
                 put( "branch", "master" );
                 put( "project-dir", "drools-webapp-example" );
             }
-        }, pipe, (Binary b) -> System.out.println( b.getName() ) );
+        }, pipe, ( Binary b ) -> System.out.println( b.getName() ) );
 
         allRepositories = sourceRegistry.getAllRepositories();
         assertEquals( 1, allRepositories.size() );
@@ -119,11 +119,11 @@ public class MavenProjectConfigExecutorTest {
         allProjects = sourceRegistry.getAllProjects( repo );
         assertEquals( 2, allProjects.size() );
         allBinaries = buildRegistry.getAllBinaries();
-        assertEquals( 2, allBinaries.size() );
+        assertEquals( 1, allBinaries.size() );
     }
 
     static class MyGitConfig implements GitConfig,
-            ContextAware {
+                                        ContextAware {
 
         private Map<String, ?> context;
 
@@ -134,12 +134,12 @@ public class MavenProjectConfigExecutorTest {
 
         @Override
         public String getCreateRepo() {
-            return ( ( ( Map ) context.get( "input" ) ).get( "create-repo" ) != null ) ? ( ( Map ) context.get( "input" ) ).get( "create-repo" ).toString() : "false";
+            return ( ( (Map) context.get( "input" ) ).get( "create-repo" ) != null ) ? ( (Map) context.get( "input" ) ).get( "create-repo" ).toString() : "false";
         }
 
         @Override
         public String getRepoName() {
-            return ( ( Map ) context.get( "input" ) ).get( "repo-name" ).toString();
+            return ( (Map) context.get( "input" ) ).get( "repo-name" ).toString();
         }
 
         @Override

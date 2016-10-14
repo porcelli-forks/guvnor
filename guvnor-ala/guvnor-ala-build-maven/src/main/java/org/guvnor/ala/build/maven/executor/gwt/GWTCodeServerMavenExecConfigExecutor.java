@@ -25,17 +25,16 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
 import javax.inject.Inject;
 
-import org.apache.maven.cli.MavenCli;
-import org.guvnor.ala.build.Project;
 import org.guvnor.ala.build.maven.config.gwt.GWTCodeServerMavenExecConfig;
-import org.guvnor.ala.build.maven.util.RepositoryVisitor;
+import org.guvnor.ala.build.maven.model.MavenBuild;
 import org.guvnor.ala.config.Config;
 import org.guvnor.ala.exceptions.BuildException;
 import org.guvnor.ala.pipeline.BiFunctionConfigExecutor;
 
-import org.guvnor.ala.build.maven.model.MavenBuild;
+import static org.guvnor.ala.build.maven.util.MavenBuildExecutor.*;
 
 public class GWTCodeServerMavenExecConfigExecutor implements BiFunctionConfigExecutor<MavenBuild, GWTCodeServerMavenExecConfig, MavenBuild> {
 
@@ -45,7 +44,7 @@ public class GWTCodeServerMavenExecConfigExecutor implements BiFunctionConfigExe
     private boolean isCodeServerReady = false;
     private volatile Throwable error = null;
     private GWTCodeServerPortLeaser leaser;
-    
+
     @Inject
     public GWTCodeServerMavenExecConfigExecutor( GWTCodeServerPortLeaser leaser ) {
         this.leaser = leaser;
@@ -53,15 +52,21 @@ public class GWTCodeServerMavenExecConfigExecutor implements BiFunctionConfigExe
 
     @Override
     public Optional<MavenBuild> apply( final MavenBuild buildConfig,
-            final GWTCodeServerMavenExecConfig config ) {
-        final File webappFolder = new File( getRepositoryVisitor( buildConfig.getProject() ).getProjectFolder().getAbsolutePath(), "src/main/webapp" );
-        List<String> goals = new ArrayList<>();
-        goals.add( "gwt:run-codeserver" );
-        goals.add( "-D" + GWT_CODE_SERVER_LAUNCHER_DIR + "=" + webappFolder.getAbsolutePath() );
-        goals.add( "-D" + GWT_CODE_SERVER_PORT + "=" + String.valueOf( leaser.getAvailableCodeServerPort().getPortNumber() ) );
-        goals.add( "-D" + GWT_CODE_SERVER_BIND_ADDRESS + "=" + config.getBindAddress() );
+                                       final GWTCodeServerMavenExecConfig config ) {
 
-        build( buildConfig.getProject(), goals );
+        final File projectFolder = getRepositoryVisitor( buildConfig.getProject() ).getProjectFolder();
+
+        final File pom = new File( projectFolder, "pom.xml" );
+
+        final File webappFolder = new File( projectFolder.getAbsolutePath(), "src/main/webapp" );
+        List<String> goals = new ArrayList<>( buildConfig.getGoals() );
+        goals.add( "gwt:run-codeserver" );
+        final Properties properties = new Properties( buildConfig.getProperties() );
+        properties.put( GWT_CODE_SERVER_LAUNCHER_DIR, webappFolder.getAbsolutePath() );
+        properties.put( GWT_CODE_SERVER_PORT, String.valueOf( leaser.getAvailableCodeServerPort().getPortNumber() ) );
+        properties.put( GWT_CODE_SERVER_BIND_ADDRESS, config.getBindAddress() );
+
+        build( pom, properties, goals );
 
         return Optional.of( buildConfig );
     }
@@ -81,8 +86,9 @@ public class GWTCodeServerMavenExecConfigExecutor implements BiFunctionConfigExe
         return "gwt-codeserver-config";
     }
 
-    public void build( final Project project,
-            final List<String> goals ) throws BuildException {
+    public void build( final File pom,
+                       final Properties properties,
+                       final List<String> goals ) throws BuildException {
         BufferedReader bufferedReader = null;
         try {
             PipedOutputStream baosOut = new PipedOutputStream();
@@ -90,7 +96,7 @@ public class GWTCodeServerMavenExecConfigExecutor implements BiFunctionConfigExe
             final PrintStream out = new PrintStream( baosOut, true );
             final PrintStream err = new PrintStream( baosErr, true );
             new Thread( () -> {
-                executeMaven( project, out, err, goals.toArray( new String[]{} ) );
+                executeMaven( pom, out, err, properties, goals.toArray( new String[]{} ) );
             } ).start();
             bufferedReader = new BufferedReader( new InputStreamReader( new PipedInputStream( baosOut ) ) );
             String line;
@@ -111,19 +117,5 @@ public class GWTCodeServerMavenExecConfigExecutor implements BiFunctionConfigExe
         }
 
     }
-
-    private void executeMaven( final Project project, final PrintStream out, final PrintStream err,
-            final String... goals ) {
-        new MavenCli().doMain( goals,
-                getRepositoryVisitor( project ).getProjectFolder().getAbsolutePath(),
-                out, err );
-
-    }
-
-    private RepositoryVisitor getRepositoryVisitor( final Project project ) {
-        return new RepositoryVisitor( project );
-    }
-
-    
 
 }

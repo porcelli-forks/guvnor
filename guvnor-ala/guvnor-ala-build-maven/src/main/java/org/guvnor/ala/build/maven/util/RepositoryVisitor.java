@@ -65,7 +65,7 @@ public class RepositoryVisitor {
                 + File.separatorChar + project.getPath().toAbsolutePath().toString() + File.separatorChar + "target" );
     }
 
-    private void visitPaths( final DirectoryStream<Path> directoryStream ) throws IOException {
+    public void visitPaths( final DirectoryStream<Path> directoryStream ) throws IOException {
         for ( final org.uberfire.java.nio.file.Path path : directoryStream ) {
             if ( Files.isDirectory( path ) ) {
                 makeTempDirectory( path );
@@ -76,11 +76,11 @@ public class RepositoryVisitor {
         }
     }
 
-    private File makeTempDirectory( Path path ) {
+    public File makeTempDirectory( Path path ) {
         return makeTempDirectory( getFilePath( path ) );
     }
 
-    private File makeTempDirectory( String filePath ) {
+    public File makeTempDirectory( String filePath ) {
         File tempDirectory = new File( filePath );
         if ( !tempDirectory.isFile() ) {
             tempDirectory.mkdir();
@@ -90,7 +90,9 @@ public class RepositoryVisitor {
 
     private void makeTempRootDirectory() {
         File tempDirectory = new File( buildRoot );
-        tempDirectory.mkdirs();
+        if(!tempDirectory.exists()){
+            tempDirectory.mkdirs();
+        }
     }
 
     private void makeTempFile( Path path ) throws IOException {
@@ -102,7 +104,9 @@ public class RepositoryVisitor {
         try ( BufferedInputStream origin = new BufferedInputStream( Files.newInputStream( path ), BUFFER ) ) {
             String filePath = getFilePath( path );
             File tempFile = new File( filePath );
-            tempFile.createNewFile();
+            if(!tempFile.exists()){
+                tempFile.createNewFile();
+            }
             output = new FileOutputStream( tempFile );
             int count;
             while ( ( count = origin.read( data, 0, BUFFER ) ) != -1 ) {

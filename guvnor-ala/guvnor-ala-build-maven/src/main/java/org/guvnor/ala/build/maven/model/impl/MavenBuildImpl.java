@@ -53,7 +53,7 @@ public class MavenBuildImpl implements MavenBuild,
 
     @Override
     public Properties getProperties() {
-        return null;
+        return this.properties;
     }
 
     @Override

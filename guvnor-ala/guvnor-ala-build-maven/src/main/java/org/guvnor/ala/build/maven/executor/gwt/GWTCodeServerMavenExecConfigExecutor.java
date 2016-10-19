@@ -35,6 +35,7 @@ import org.guvnor.ala.exceptions.BuildException;
 import org.guvnor.ala.pipeline.BiFunctionConfigExecutor;
 
 import static org.guvnor.ala.build.maven.util.MavenBuildExecutor.*;
+import org.guvnor.ala.build.maven.util.RepositoryVisitor;
 
 public class GWTCodeServerMavenExecConfigExecutor implements BiFunctionConfigExecutor<MavenBuild, GWTCodeServerMavenExecConfig, MavenBuild> {
 
@@ -44,31 +45,37 @@ public class GWTCodeServerMavenExecConfigExecutor implements BiFunctionConfigExe
     private boolean isCodeServerReady = false;
     private volatile Throwable error = null;
     private GWTCodeServerPortLeaser leaser;
-
     @Inject
-    public GWTCodeServerMavenExecConfigExecutor( GWTCodeServerPortLeaser leaser ) {
+    public GWTCodeServerMavenExecConfigExecutor(GWTCodeServerPortLeaser leaser) {
         this.leaser = leaser;
+        
     }
 
     @Override
-    public Optional<MavenBuild> apply( final MavenBuild buildConfig,
-                                       final GWTCodeServerMavenExecConfig config ) {
+    public Optional<MavenBuild> apply(final MavenBuild buildConfig,
+            final GWTCodeServerMavenExecConfig config) {
+        RepositoryVisitor repositoryVisitor = getRepositoryVisitor(buildConfig.getProject());
+        final File projectFolder = repositoryVisitor.getProjectFolder();
+        final File webappFolder = new File(projectFolder.getAbsolutePath(), "src/main/webapp");
+        
+        if((!leaser.isCodeServerRunning(buildConfig.getProject().getName()))){
+            System.out.println("Starting GWT Code Server");
+            final File pom = new File(projectFolder, "pom.xml");
+           
+            List<String> goals = new ArrayList<>();
+            goals.add("gwt:run-codeserver");
+            final Properties properties = new Properties(buildConfig.getProperties());
+            properties.put(GWT_CODE_SERVER_LAUNCHER_DIR, webappFolder.getAbsolutePath());
+            Integer portNumber = leaser.getAvailableCodeServerPort().getPortNumber();
+            leaser.setCodeServerForProject(buildConfig.getProject().getName(), portNumber);
+            properties.put(GWT_CODE_SERVER_PORT, String.valueOf(portNumber));
+            properties.put(GWT_CODE_SERVER_BIND_ADDRESS, config.getBindAddress());
+            build(pom, properties, goals);
+        }else{
+            System.out.println(" No need to start GWT Code Server");
+        }
 
-        final File projectFolder = getRepositoryVisitor( buildConfig.getProject() ).getProjectFolder();
-
-        final File pom = new File( projectFolder, "pom.xml" );
-
-        final File webappFolder = new File( projectFolder.getAbsolutePath(), "src/main/webapp" );
-        List<String> goals = new ArrayList<>( buildConfig.getGoals() );
-        goals.add( "gwt:run-codeserver" );
-        final Properties properties = new Properties( buildConfig.getProperties() );
-        properties.put( GWT_CODE_SERVER_LAUNCHER_DIR, webappFolder.getAbsolutePath() );
-        properties.put( GWT_CODE_SERVER_PORT, String.valueOf( leaser.getAvailableCodeServerPort().getPortNumber() ) );
-        properties.put( GWT_CODE_SERVER_BIND_ADDRESS, config.getBindAddress() );
-
-        build( pom, properties, goals );
-
-        return Optional.of( buildConfig );
+        return Optional.of(buildConfig);
     }
 
     @Override
@@ -86,36 +93,47 @@ public class GWTCodeServerMavenExecConfigExecutor implements BiFunctionConfigExe
         return "gwt-codeserver-config";
     }
 
-    public void build( final File pom,
-                       final Properties properties,
-                       final List<String> goals ) throws BuildException {
+    public void build(final File pom,
+            final Properties properties,
+            final List<String> goals) throws BuildException {
         BufferedReader bufferedReader = null;
+        StringBuilder sb = new StringBuilder();
         try {
             PipedOutputStream baosOut = new PipedOutputStream();
             PipedOutputStream baosErr = new PipedOutputStream();
-            final PrintStream out = new PrintStream( baosOut, true );
-            final PrintStream err = new PrintStream( baosErr, true );
-            new Thread( () -> {
-                executeMaven( pom, out, err, properties, goals.toArray( new String[]{} ) );
-            } ).start();
-            bufferedReader = new BufferedReader( new InputStreamReader( new PipedInputStream( baosOut ) ) );
+            final PrintStream out = new PrintStream(baosOut, true);
+            final PrintStream err = new PrintStream(baosErr, true);
+            final PrintStream oldout = System.out;
+            final PrintStream olderr = System.err;
+            new Thread(() -> {
+                executeMaven(pom, out, err, properties, goals.toArray(new String[]{}));
+            }).start();
+            bufferedReader = new BufferedReader(new InputStreamReader(new PipedInputStream(baosOut)));
             String line;
-            StringBuilder sb = new StringBuilder();
-            while ( !( isCodeServerReady || error != null ) ) {
-                if ( ( line = bufferedReader.readLine() ) != null ) {
-                    sb.append( line ).append( "\n" );
-                    if ( line.contains( "The code server is ready at" ) ) {
+
+            while (!(isCodeServerReady || error != null)) {
+                if ((line = bufferedReader.readLine()) != null) {
+                    sb.append(line).append("\n");
+                    if (line.contains("The code server is ready at")) {
                         isCodeServerReady = true;
+                        out.close();
+                        err.close();
+                        baosOut.close();
+                        baosErr.close();
+                        System.setOut(oldout);
+                        System.setErr(olderr);
+                        System.out.println("Code Server Ready.. moving on... ");
                     }
                 }
                 //@TODO: send line to client
             }
 
-        } catch ( IOException ex ) {
+        } catch (IOException ex) {
             // MavenCli will close abruptly the pipe when the build process finishes, so we just swallow this exception.
             ex.printStackTrace();
         }
 
     }
+   
 
 }

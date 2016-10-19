@@ -60,7 +60,7 @@ public class GitConfigExecutor implements FunctionConfigExecutor<GitConfig, Sour
             } );
         }
         final GitRepository gitRepository = ( GitRepository ) new UFLocal().getRepository( gitConfig.getRepoName(), Collections.emptyMap() );
-        final Optional<Source> source_ = Optional.ofNullable( gitRepository.getSource( gitConfig.getBranch() != null && !gitConfig.getBranch().isEmpty() ? gitConfig.getBranch() : "master" ) );
+        final Optional<Source> source_ = Optional.ofNullable( gitRepository.getSource( (gitConfig.getBranch() != null && !gitConfig.getBranch().isEmpty()) ? gitConfig.getBranch() : "master" ) );
         if ( source_.isPresent() ) {
             Source source = source_.get();
             sourceRegistry.registerRepositorySources( source.getPath(), gitRepository );

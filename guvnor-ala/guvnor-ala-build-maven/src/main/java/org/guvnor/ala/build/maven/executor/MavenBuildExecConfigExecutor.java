@@ -77,7 +77,7 @@ public class MavenBuildExecConfigExecutor implements BiFunctionConfigExecutor<Ma
                       final Properties properties ) throws BuildException {
         final File pom = new File( getRepositoryVisitor( project ).getProjectFolder(), "pom.xml" );
 
-        return executeMaven( pom, properties, goals.toArray( new String[]{} ) );
+        return executeMaven( pom, System.out, System.err, properties, goals.toArray( new String[]{} ) );
     }
 
 }

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.guvnor.ala.build.maven.util;
 
 import java.io.File;
@@ -33,40 +32,50 @@ public final class MavenBuildExecutor {
     private MavenBuildExecutor() {
     }
 
-    public static int executeMaven( final File pom,
-                                    final Properties properties,
-                                    final String... goals ) {
-        return executeMaven( pom, System.out, System.err, properties, goals );
+    public static int executeMaven(final File pom,
+            final Properties properties,
+            final String... goals) {
+        return executeMaven(pom, System.out, System.err, properties, goals);
     }
 
-    public static int executeMaven( final File pom,
-                                    final PrintStream stdout,
-                                    final PrintStream stderr,
-                                    final Properties properties,
-                                    final String... goals ) {
+    public static int executeMaven(final File pom,
+            final PrintStream stdout,
+            final PrintStream stderr,
+            final Properties properties,
+            final String... goals) {
+        System.out.println("XXXXX About to Exeucute maven with the following goals: " + Arrays.toString(goals));
+        System.out.println("XXXXX About to Exeucute maven with the following properties: " + properties);
         final PrintStream oldout = System.out;
         final PrintStream olderr = System.err;
-        System.setProperties( properties );
+        if (properties != null) {
+            properties.keySet().forEach((o) -> {
+                if(properties.getProperty((String) o) != null){
+                    System.setProperty((String) o, properties.getProperty((String) o));
+                }
+            });
+        }
 
         final MavenEmbedder mavenEmbedder = newMavenEmbedder();
         try {
-            if ( stdout != null ) {
-                System.setOut( stdout );
+            if (stdout != null) {
+                System.setOut(stdout);
             }
-            if ( stderr != null ) {
-                System.setErr( stderr );
+            if (stderr != null) {
+                System.setErr(stderr);
             }
 
-            final MavenRequest mavenRequest = MavenProjectLoader.createMavenRequest( false );
-            mavenRequest.setGoals( Arrays.asList( goals ) );
-            mavenRequest.setPom( pom.getAbsolutePath() );
-            final MavenExecutionResult result = mavenEmbedder.execute( mavenRequest );
-        } catch ( final MavenEmbedderException ex ) {
+            final MavenRequest mavenRequest = MavenProjectLoader.createMavenRequest(false);
+            mavenRequest.setGoals(Arrays.asList(goals));
+            mavenRequest.setPom(pom.getAbsolutePath());
+
+            final MavenExecutionResult result = mavenEmbedder.execute(mavenRequest);
+        } catch (final MavenEmbedderException ex) {
+            ex.printStackTrace();
             return -1;
         } finally {
             mavenEmbedder.dispose();
-            System.setOut( oldout );
-            System.setErr( olderr );
+            System.setOut(oldout);
+            System.setErr(olderr);
         }
         return 0;
     }
@@ -74,15 +83,15 @@ public final class MavenBuildExecutor {
     private static MavenEmbedder newMavenEmbedder() {
         MavenEmbedder mavenEmbedder;
         try {
-            mavenEmbedder = new MavenEmbedder( MavenProjectLoader.createMavenRequest( false ) );
-        } catch ( MavenEmbedderException e ) {
-            throw new RuntimeException( e );
+            mavenEmbedder = new MavenEmbedder(MavenProjectLoader.createMavenRequest(false));
+        } catch (MavenEmbedderException e) {
+            throw new RuntimeException(e);
         }
         return mavenEmbedder;
     }
 
-    public static RepositoryVisitor getRepositoryVisitor( final Project project ) {
-        return new RepositoryVisitor( project );
+    public static RepositoryVisitor getRepositoryVisitor(final Project project) {
+        return new RepositoryVisitor(project);
     }
 
 }

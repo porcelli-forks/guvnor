@@ -85,4 +85,9 @@ public final class MavenBuildExecutor {
         return new RepositoryVisitor( project );
     }
 
+    public static RepositoryVisitor getRepositoryVisitor( final Project project,
+                                                          final String tempDir ) {
+        return new RepositoryVisitor( project, tempDir, true );
+    }
+
 }

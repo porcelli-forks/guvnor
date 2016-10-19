@@ -28,9 +28,9 @@ import org.guvnor.ala.source.Source;
 import org.guvnor.ala.source.git.GitRepository;
 import org.guvnor.ala.source.git.UFLocal;
 import org.guvnor.ala.source.git.config.GitConfig;
+import org.uberfire.java.nio.file.FileSystems;
 
 import static org.uberfire.commons.validation.PortablePreconditions.*;
-import org.uberfire.java.nio.file.FileSystems;
 
 public class GitConfigExecutor implements FunctionConfigExecutor<GitConfig, Source> {
 
@@ -44,7 +44,7 @@ public class GitConfigExecutor implements FunctionConfigExecutor<GitConfig, Sour
     @Override
     public Optional<Source> apply( final GitConfig gitConfig ) {
         checkNotEmpty( "repo-name parameter is mandatory", gitConfig.getRepoName() );
-        if ( Boolean.parseBoolean(gitConfig.getCreateRepo() ) ) {
+        if ( Boolean.parseBoolean( gitConfig.getCreateRepo() ) ) {
             final URI uri = URI.create( "git://" + gitConfig.getRepoName() );
             FileSystems.newFileSystem( uri, new HashMap<String, Object>() {
                 {
@@ -58,15 +58,18 @@ public class GitConfigExecutor implements FunctionConfigExecutor<GitConfig, Sour
                     }
                 }
             } );
+        } else {
+            final URI uri = URI.create( "git://" + gitConfig.getRepoName() + "?sync" );
+            FileSystems.getFileSystem( uri );
         }
-        final GitRepository gitRepository = ( GitRepository ) new UFLocal().getRepository( gitConfig.getRepoName(), Collections.emptyMap() );
-        final Optional<Source> source_ = Optional.ofNullable( gitRepository.getSource( gitConfig.getBranch() != null && !gitConfig.getBranch().isEmpty() ? gitConfig.getBranch() : "master" ) );
-        if ( source_.isPresent() ) {
-            Source source = source_.get();
+        final GitRepository gitRepository = (GitRepository) new UFLocal().getRepository( gitConfig.getRepoName(), Collections.emptyMap() );
+        final Optional<Source> _source = Optional.ofNullable( gitRepository.getSource( gitConfig.getBranch() != null && !gitConfig.getBranch().isEmpty() ? gitConfig.getBranch() : "master" ) );
+        if ( _source.isPresent() ) {
+            Source source = _source.get();
             sourceRegistry.registerRepositorySources( source.getPath(), gitRepository );
             sourceRegistry.registerSource( gitRepository, source );
         }
-        return source_;
+        return _source;
     }
 
     @Override

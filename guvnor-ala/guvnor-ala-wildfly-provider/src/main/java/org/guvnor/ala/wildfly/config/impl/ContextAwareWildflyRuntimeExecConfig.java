@@ -16,7 +16,6 @@
 
 package org.guvnor.ala.wildfly.config.impl;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -38,7 +37,6 @@ public class ContextAwareWildflyRuntimeExecConfig implements
     private Map<String, ?> context;
     private ProviderId providerId;
     private String warPath;
-    private final Map<Project, RepositoryVisitor> projectVisitorMap = new HashMap<>();
 
     public ContextAwareWildflyRuntimeExecConfig() {
     }
@@ -73,14 +71,7 @@ public class ContextAwareWildflyRuntimeExecConfig implements
     }
 
     private RepositoryVisitor getRepositoryVisitor( final Project project ) {
-        final RepositoryVisitor projectVisitor;
-        if ( projectVisitorMap.containsKey( project ) ) {
-            projectVisitor = projectVisitorMap.get( project );
-        } else {
-            projectVisitor = new RepositoryVisitor( project );
-            projectVisitorMap.put( project, projectVisitor );
-        }
-        return projectVisitor;
+        return new RepositoryVisitor( project );
     }
 
     @Override

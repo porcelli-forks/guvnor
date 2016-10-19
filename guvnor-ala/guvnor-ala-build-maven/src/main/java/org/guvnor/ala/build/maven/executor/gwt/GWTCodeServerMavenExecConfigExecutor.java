@@ -95,9 +95,7 @@ public class GWTCodeServerMavenExecConfigExecutor implements BiFunctionConfigExe
             PipedOutputStream baosErr = new PipedOutputStream();
             final PrintStream out = new PrintStream( baosOut, true );
             final PrintStream err = new PrintStream( baosErr, true );
-            new Thread( () -> {
-                executeMaven( pom, out, err, properties, goals.toArray( new String[]{} ) );
-            } ).start();
+            new Thread( () -> executeMaven( pom, out, err, properties, goals.toArray( new String[]{} ) ) ).start();
             bufferedReader = new BufferedReader( new InputStreamReader( new PipedInputStream( baosOut ) ) );
             String line;
             StringBuilder sb = new StringBuilder();

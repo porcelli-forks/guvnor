@@ -28,22 +28,22 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.cli.MavenCli;
 import org.apache.maven.project.MavenProject;
-
 import org.guvnor.ala.build.Project;
 import org.guvnor.ala.build.maven.model.impl.MavenProjectImpl;
-
 import org.guvnor.ala.build.maven.util.RepositoryVisitor;
 import org.guvnor.ala.source.Source;
 import org.guvnor.ala.source.git.GitHub;
 import org.guvnor.ala.source.git.GitRepository;
 import org.junit.After;
-import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.kie.scanner.embedder.MavenProjectLoader;
+
+import static org.junit.Assert.*;
 
 /**
  *
@@ -68,7 +68,7 @@ public class MavenCliOutputTest {
     @Test
     public void waitForAppBuildTest() {
         final GitHub gitHub = new GitHub();
-        final GitRepository repository = ( GitRepository ) gitHub.getRepository( "salaboy/drools-workshop", new HashMap<String, String>() {
+        final GitRepository repository = (GitRepository) gitHub.getRepository( "salaboy/drools-workshop", new HashMap<String, String>() {
             {
                 put( "out-dir", tempPath.getAbsolutePath() );
             }
@@ -83,22 +83,23 @@ public class MavenCliOutputTest {
         new Thread( () -> {
             List<String> goals = new ArrayList<>();
             goals.add( "package" );
-            goals.add("-DfailIfNoTests=false");
+            goals.add( "-DfailIfNoTests=false" );
             final InputStream pomStream = org.uberfire.java.nio.file.Files.newInputStream( source.getPath().resolve( "drools-webapp-example" ).resolve( "pom.xml" ) );
             MavenProject project = MavenProjectLoader.parseMavenPom( pomStream );
 
             final String expectedBinary = project.getArtifact().getArtifactId() + "-" + project.getArtifact().getVersion() + "." + project.getArtifact().getType();
             final org.guvnor.ala.build.maven.model.MavenProject mavenProject = new MavenProjectImpl( project.getId(),
-                    project.getArtifact().getType(),
-                    project.getName(),
-                    expectedBinary,
-                    source.getPath(),
-                    source.getPath().resolve( "drools-webapp-example" ),
-                    source.getPath().resolve( "target" ).resolve( expectedBinary ).toAbsolutePath(),
-                    null );
-            new MavenCli().doMain( goals.toArray( new String[0] ),
-                    getRepositoryVisitor( mavenProject ).getProjectFolder().getAbsolutePath(),
-                    out, err );
+                                                                                                     project.getArtifact().getType(),
+                                                                                                     project.getName(),
+                                                                                                     expectedBinary,
+                                                                                                     source.getPath(),
+                                                                                                     source.getPath().resolve( "drools-webapp-example" ),
+                                                                                                     source.getPath().resolve( "target" ).resolve( expectedBinary ).toAbsolutePath(),
+                                                                                                     null,
+                                                                                                     null );
+            new MavenCli().doMain( goals.toArray( new String[ 0 ] ),
+                                   getRepositoryVisitor( mavenProject ).getProjectFolder().getAbsolutePath(),
+                                   out, err );
         } ).start();
         StringBuilder sb = new StringBuilder();
         try {

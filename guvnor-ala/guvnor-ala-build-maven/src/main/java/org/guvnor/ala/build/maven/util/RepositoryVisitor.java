@@ -21,10 +21,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import org.apache.commons.io.FileUtils;
+import org.guvnor.ala.build.Project;
 import org.uberfire.java.nio.file.DirectoryStream;
 import org.uberfire.java.nio.file.Files;
 import org.uberfire.java.nio.file.Path;
-import org.guvnor.ala.build.Project;
 
 public class RepositoryVisitor {
 
@@ -34,12 +35,20 @@ public class RepositoryVisitor {
     private String buildRoot;
 
     public RepositoryVisitor( final Project project ) {
+        this( project,
+              System.getProperty( "java.io.tmpdir" ) + File.separatorChar + "guvnor" + File.separatorChar + project.getName(),
+              false );
+    }
+
+    public RepositoryVisitor( final Project project,
+                              final String buildRoot,
+                              final boolean preserveContent ) {
         this.project = project;
-        this.buildRoot = System.getProperty( "java.io.tmpdir" ) + File.separatorChar + "guvnor" + File.separatorChar + project.getName();
+        this.buildRoot = buildRoot;
         Path path = this.project.getPath();
-        makeTempRootDirectory();
-        makeTempDirectory( path );
-        rootFolder = makeTempDirectory( path );
+        makeTempRootDirectory( preserveContent );
+        makeTempDirectory( getFilePath( path ) );
+        rootFolder = makeTempDirectory( getFilePath( path ) );
         projectFolder = new File( rootFolder.getAbsolutePath() );
         try {
             visitPaths( Files.newDirectoryStream( this.project.getPath() ) );
@@ -62,13 +71,13 @@ public class RepositoryVisitor {
 
     public File getTargetFolder() {
         return new File( buildRoot + File.separatorChar + project.getRootPath().toAbsolutePath()
-                + File.separatorChar + project.getPath().toAbsolutePath().toString() + File.separatorChar + "target" );
+                                 + File.separatorChar + project.getPath().toAbsolutePath().toString() + File.separatorChar + "target" );
     }
 
     private void visitPaths( final DirectoryStream<Path> directoryStream ) throws IOException {
         for ( final org.uberfire.java.nio.file.Path path : directoryStream ) {
             if ( Files.isDirectory( path ) ) {
-                makeTempDirectory( path );
+                makeTempDirectory( getFilePath( path ) );
                 visitPaths( Files.newDirectoryStream( path ) );
             } else {
                 makeTempFile( path );
@@ -76,33 +85,44 @@ public class RepositoryVisitor {
         }
     }
 
-    private File makeTempDirectory( Path path ) {
-        return makeTempDirectory( getFilePath( path ) );
-    }
-
     private File makeTempDirectory( String filePath ) {
         File tempDirectory = new File( filePath );
+        if ( tempDirectory.exists() ) {
+            return tempDirectory;
+        }
         if ( !tempDirectory.isFile() ) {
             tempDirectory.mkdir();
         }
         return tempDirectory;
     }
 
-    private void makeTempRootDirectory() {
-        File tempDirectory = new File( buildRoot );
-        tempDirectory.mkdirs();
+    private void makeTempRootDirectory( final boolean preserveContent ) {
+        final File tempDirectory = new File( buildRoot );
+        if ( tempDirectory.exists() ) {
+            if ( !preserveContent ) {
+                try {
+                    FileUtils.deleteDirectory( tempDirectory );
+                } catch ( IOException e ) {
+                    e.printStackTrace();
+                }
+            }
+        } else {
+            tempDirectory.mkdirs();
+        }
     }
 
     private void makeTempFile( Path path ) throws IOException {
 
         final int BUFFER = 2048;
-        byte data[] = new byte[BUFFER];
+        byte data[] = new byte[ BUFFER ];
 
         FileOutputStream output = null;
         try ( BufferedInputStream origin = new BufferedInputStream( Files.newInputStream( path ), BUFFER ) ) {
             String filePath = getFilePath( path );
             File tempFile = new File( filePath );
-            tempFile.createNewFile();
+            if ( !tempFile.exists() ) {
+                tempFile.createNewFile();
+            }
             output = new FileOutputStream( tempFile );
             int count;
             while ( ( count = origin.read( data, 0, BUFFER ) ) != -1 ) {

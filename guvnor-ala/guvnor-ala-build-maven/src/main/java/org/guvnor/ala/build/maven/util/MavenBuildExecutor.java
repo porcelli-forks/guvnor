@@ -22,11 +22,11 @@ import java.util.Arrays;
 import java.util.Properties;
 
 import org.apache.maven.execution.MavenExecutionResult;
-import org.guvnor.ala.build.Project;
 import org.kie.scanner.embedder.MavenEmbedder;
 import org.kie.scanner.embedder.MavenEmbedderException;
 import org.kie.scanner.embedder.MavenProjectLoader;
 import org.kie.scanner.embedder.MavenRequest;
+import org.uberfire.java.nio.file.Path;
 
 public final class MavenBuildExecutor {
 
@@ -81,13 +81,16 @@ public final class MavenBuildExecutor {
         return mavenEmbedder;
     }
 
-    public static RepositoryVisitor getRepositoryVisitor( final Project project ) {
-        return new RepositoryVisitor( project );
-    }
-
-    public static RepositoryVisitor getRepositoryVisitor( final Project project,
-                                                          final String tempDir ) {
-        return new RepositoryVisitor( project, tempDir, true );
-    }
+//    public static RepositoryVisitor getRepositoryVisitor( final Path projectPath,
+//                                                          final String projectName,
+//                                                          final String projectRoot ) {
+//        return new RepositoryVisitor( projectPath, projectName, projectRoot );
+//    }
+//
+//    public static RepositoryVisitor getRepositoryVisitor( final Path projectPath,
+//                                                          final String repositoryRoot,
+//                                                          final String projectRoot ) {
+//        return new RepositoryVisitor( projectPath, repositoryRoot, projectRoot, true );
+//    }
 
 }

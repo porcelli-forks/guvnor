@@ -38,7 +38,7 @@ public interface MavenProjectConfig extends ProjectConfig {
         return "${input.project-temp-dir}";
     }
 
-    default boolean preserveTempDir() {
+    default boolean recreateTempDir() {
         return Boolean.parseBoolean( "${input.preserve-temp-dir}" );
     }
 

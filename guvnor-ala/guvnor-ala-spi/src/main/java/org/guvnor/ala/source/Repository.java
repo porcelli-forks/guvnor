@@ -57,6 +57,5 @@ public interface Repository {
     * @see Source
      */
     Source getSource( final String root,
-                      final String outDir,
                       final String... path ) throws SourcingException;
 }

@@ -26,7 +26,6 @@ import org.guvnor.ala.build.maven.config.MavenBuildExecConfig;
 import org.guvnor.ala.build.maven.model.MavenBinary;
 import org.guvnor.ala.build.maven.model.MavenBuild;
 import org.guvnor.ala.build.maven.model.impl.MavenBinaryImpl;
-import org.guvnor.ala.build.maven.util.RepositoryVisitor;
 import org.guvnor.ala.config.BinaryConfig;
 import org.guvnor.ala.config.Config;
 import org.guvnor.ala.exceptions.BuildException;
@@ -76,13 +75,7 @@ public class MavenBuildExecConfigExecutor implements BiFunctionConfigExecutor<Ma
     public int build( final Project project,
                       final List<String> goals,
                       final Properties properties ) throws BuildException {
-        final RepositoryVisitor repositoryVisitor;
-        if ( !project.getTempDir().isEmpty() ) {
-            repositoryVisitor = getRepositoryVisitor( project );
-        } else {
-            repositoryVisitor = getRepositoryVisitor( project, project.getTempDir() );
-        }
-        final File pom = new File( repositoryVisitor.getProjectFolder(), "pom.xml" );
+        final File pom = new File( project.getTempDir(), "pom.xml" );
 
         return executeMaven( pom, properties, goals.toArray( new String[]{} ) );
     }

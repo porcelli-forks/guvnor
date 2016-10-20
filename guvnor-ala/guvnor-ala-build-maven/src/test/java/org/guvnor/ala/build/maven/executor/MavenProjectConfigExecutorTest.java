@@ -105,8 +105,11 @@ public class MavenProjectConfigExecutorTest {
         List<Binary> allBinaries = buildRegistry.getAllBinaries();
         assertEquals( 1, allBinaries.size() );
 
+        final String tempDir = sourceRegistry.getAllProjects( repo ).get( 0 ).getTempDir();
+
         executor.execute( new Input() {
             {
+                put( "project-temp-dir", tempDir );
                 put( "repo-name", "drools-workshop-pipe" );
                 put( "branch", "master" );
                 put( "project-dir", "drools-webapp-example" );

@@ -24,20 +24,20 @@ public class MavenProjectConfigImpl implements MavenProjectConfig,
 
     private final String projectDir;
     private final String projectTempDir;
-    private final boolean preserveTempDir;
+    private final boolean recreateTempDir;
 
     public MavenProjectConfigImpl() {
         this.projectDir = MavenProjectConfig.super.getProjectDir();
         this.projectTempDir = MavenProjectConfig.super.getProjectTempDir();
-        this.preserveTempDir = MavenProjectConfig.super.preserveTempDir();
+        this.recreateTempDir = MavenProjectConfig.super.recreateTempDir();
     }
 
     public MavenProjectConfigImpl( final String projectDir,
                                    final String projectTempDir,
-                                   final boolean preserveTempDir ) {
+                                   final boolean recreateTempDir ) {
         this.projectDir = projectDir;
         this.projectTempDir = projectTempDir;
-        this.preserveTempDir = preserveTempDir;
+        this.recreateTempDir = recreateTempDir;
     }
 
     @Override
@@ -51,8 +51,8 @@ public class MavenProjectConfigImpl implements MavenProjectConfig,
     }
 
     @Override
-    public boolean preserveTempDir() {
-        return preserveTempDir;
+    public boolean recreateTempDir() {
+        return recreateTempDir;
     }
 
     @Override
@@ -60,7 +60,7 @@ public class MavenProjectConfigImpl implements MavenProjectConfig,
         return "MavenProjectConfigImpl{" +
                 "projectDir='" + projectDir + '\'' +
                 ", projectTempDir='" + projectTempDir + '\'' +
-                ", preserveTempDir=" + preserveTempDir +
+                ", recreateTempDir=" + recreateTempDir +
                 '}';
     }
 
@@ -68,6 +68,6 @@ public class MavenProjectConfigImpl implements MavenProjectConfig,
     public MavenProjectConfig asNewClone( final MavenProjectConfig source ) {
         return new MavenProjectConfigImpl( source.getProjectDir(),
                                            source.getProjectTempDir(),
-                                           source.preserveTempDir() );
+                                           source.recreateTempDir() );
     }
 }

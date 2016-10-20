@@ -53,8 +53,7 @@ public class GWTCodeServerMavenExecConfigExecutor implements BiFunctionConfigExe
     @Override
     public Optional<MavenBuild> apply( final MavenBuild buildConfig,
                                        final GWTCodeServerMavenExecConfig config ) {
-
-        final File projectFolder = getRepositoryVisitor( buildConfig.getProject() ).getProjectFolder();
+        final File projectFolder = new File( buildConfig.getProject().getTempDir() );
 
         final File pom = new File( projectFolder, "pom.xml" );
 

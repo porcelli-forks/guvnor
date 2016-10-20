@@ -23,6 +23,4 @@ public interface Source extends SourceConfig {
 
     Path getPath();
 
-    String getOutDir();
-
 }

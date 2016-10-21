@@ -21,7 +21,6 @@ import java.util.Arrays;
 import java.util.Properties;
 
 import org.apache.maven.execution.MavenExecutionResult;
-import org.guvnor.ala.build.Project;
 import org.kie.scanner.embedder.MavenEmbedder;
 import org.kie.scanner.embedder.MavenEmbedderException;
 import org.kie.scanner.embedder.MavenProjectLoader;
@@ -90,8 +89,6 @@ public final class MavenBuildExecutor {
         return mavenEmbedder;
     }
 
-    public static RepositoryVisitor getRepositoryVisitor(final Project project) {
-        return new RepositoryVisitor(project);
-    }
+
 
 }

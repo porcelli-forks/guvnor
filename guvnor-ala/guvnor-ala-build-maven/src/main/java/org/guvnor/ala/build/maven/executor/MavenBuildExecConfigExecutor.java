@@ -26,6 +26,7 @@ import org.guvnor.ala.build.maven.config.MavenBuildExecConfig;
 import org.guvnor.ala.build.maven.model.MavenBinary;
 import org.guvnor.ala.build.maven.model.MavenBuild;
 import org.guvnor.ala.build.maven.model.impl.MavenBinaryImpl;
+import org.guvnor.ala.build.maven.util.RepositoryVisitor;
 import org.guvnor.ala.config.BinaryConfig;
 import org.guvnor.ala.config.Config;
 import org.guvnor.ala.exceptions.BuildException;
@@ -39,22 +40,22 @@ public class MavenBuildExecConfigExecutor implements BiFunctionConfigExecutor<Ma
     private final BuildRegistry buildRegistry;
 
     @Inject
-    public MavenBuildExecConfigExecutor( final BuildRegistry buildRegistry ) {
+    public MavenBuildExecConfigExecutor(final BuildRegistry buildRegistry) {
         this.buildRegistry = buildRegistry;
     }
 
     @Override
-    public Optional<BinaryConfig> apply( final MavenBuild mavenBuild,
-                                         final MavenBuildExecConfig mavenBuildExecConfig ) {
+    public Optional<BinaryConfig> apply(final MavenBuild mavenBuild,
+            final MavenBuildExecConfig mavenBuildExecConfig) {
 
-        int result = build( mavenBuild.getProject(), mavenBuild.getGoals(), mavenBuild.getProperties() );
-        if ( result != 0 ) {
-            throw new RuntimeException( "Cannot build Maven Project. Look at the previous logs for more information." );
+        int result = build(mavenBuild.getProject(), mavenBuild.getGoals(), mavenBuild.getProperties());
+        if (result != 0) {
+            throw new RuntimeException("Cannot build Maven Project. Look at the previous logs for more information.");
 
         }
-        final MavenBinary binary = new MavenBinaryImpl( mavenBuild.getProject() );
-        buildRegistry.registerBinary( binary );
-        return Optional.of( binary );
+        final MavenBinary binary = new MavenBinaryImpl(mavenBuild.getProject());
+        buildRegistry.registerBinary(binary);
+        return Optional.of(binary);
     }
 
     @Override
@@ -72,12 +73,11 @@ public class MavenBuildExecConfigExecutor implements BiFunctionConfigExecutor<Ma
         return "maven-exec-config";
     }
 
-    public int build( final Project project,
-                      final List<String> goals,
-                      final Properties properties ) throws BuildException {
-        final File pom = new File( getRepositoryVisitor( project ).getProjectFolder(), "pom.xml" );
-
-        return executeMaven( pom, System.out, System.err, properties, goals.toArray( new String[]{} ) );
+    public int build(final Project project,
+            final List<String> goals,
+            final Properties properties) throws BuildException {
+        final File pom = new File( project.getTempDir(), "pom.xml" );
+        return executeMaven(pom, System.out, System.err, properties, goals.toArray(new String[]{}));
     }
 
 }

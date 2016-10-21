@@ -105,8 +105,11 @@ public class MavenProjectConfigExecutorTest {
         List<Binary> allBinaries = buildRegistry.getAllBinaries();
         assertEquals( 1, allBinaries.size() );
 
+        final String tempDir = sourceRegistry.getAllProjects( repo ).get( 0 ).getTempDir();
+
         executor.execute( new Input() {
             {
+                put( "project-temp-dir", tempDir );
                 put( "repo-name", "drools-workshop-pipe" );
                 put( "branch", "master" );
                 put( "project-dir", "drools-webapp-example" );
@@ -121,6 +124,66 @@ public class MavenProjectConfigExecutorTest {
         allBinaries = buildRegistry.getAllBinaries();
         assertEquals( 1, allBinaries.size() );
     }
+    
+    @Test
+    public void testGWTCodeServerAPI() {
+        final SourceRegistry sourceRegistry = new InMemorySourceRegistry();
+        final BuildRegistry buildRegistry = new InMemoryBuildRegistry();
+
+        final Stage<Input, SourceConfig> sourceConfig = config( "Git Source", ( s ) -> new MyGitConfig() );
+        final Stage<SourceConfig, ProjectConfig> projectConfig = config( "Maven Project", ( s ) -> new MavenProjectConfigImpl() );
+        final Stage<ProjectConfig, BuildConfig> buildConfig = config( "Maven Build Config", ( s ) -> new MavenBuildConfigImpl() );
+        final Stage<BuildConfig, BinaryConfig> buildExec = config( "Maven Build", ( s ) -> new MavenBuildExecConfigImpl() );
+        final Pipeline pipe = PipelineFactory
+                .startFrom( sourceConfig )
+                .andThen( projectConfig )
+                .andThen( buildConfig )
+                .andThen( buildExec ).buildAs( "my pipe" );
+
+        final PipelineExecutor executor = new PipelineExecutor( asList( new GitConfigExecutor( sourceRegistry ),
+                                                                        new MavenProjectConfigExecutor( sourceRegistry ),
+                                                                        new MavenBuildConfigExecutor(),
+                                                                        new MavenBuildExecConfigExecutor( buildRegistry ) ) );
+        executor.execute( new Input() {
+            {
+                put( "repo-name", "drools-workshop-pipe" );
+                put( "create-repo", "true" );
+                put( "branch", "master" );
+                put( "out-dir", tempPath.getAbsolutePath() );
+                put( "origin", "https://github.com/salaboy/drools-workshop" );
+                put( "project-dir", "drools-webapp-example" );
+            }
+        }, pipe, ( Binary b ) -> System.out.println( b.getName() ) );
+
+        List<Repository> allRepositories = sourceRegistry.getAllRepositories();
+        assertEquals( 1, allRepositories.size() );
+        Repository repo = allRepositories.get( 0 );
+        List<Project> allProjects = sourceRegistry.getAllProjects( repo );
+        assertEquals( 1, allProjects.size() );
+        List<Binary> allBinaries = buildRegistry.getAllBinaries();
+        assertEquals( 1, allBinaries.size() );
+
+        final String tempDir = sourceRegistry.getAllProjects( repo ).get( 0 ).getTempDir();
+
+        executor.execute( new Input() {
+            {
+                put( "project-temp-dir", tempDir );
+                put( "repo-name", "drools-workshop-pipe" );
+                put( "branch", "master" );
+                put( "project-dir", "drools-webapp-example" );
+            }
+        }, pipe, ( Binary b ) -> System.out.println( b.getName() ) );
+
+        allRepositories = sourceRegistry.getAllRepositories();
+        assertEquals( 1, allRepositories.size() );
+        repo = allRepositories.get( 0 );
+        allProjects = sourceRegistry.getAllProjects( repo );
+        assertEquals( 2, allProjects.size() );
+        allBinaries = buildRegistry.getAllBinaries();
+        assertEquals( 1, allBinaries.size() );
+    }
+    
+    
 
     static class MyGitConfig implements GitConfig,
                                         ContextAware {

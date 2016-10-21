@@ -20,91 +20,92 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Random;
 
+import org.apache.commons.io.FileUtils;
 import org.uberfire.java.nio.file.DirectoryStream;
 import org.uberfire.java.nio.file.Files;
 import org.uberfire.java.nio.file.Path;
-import org.guvnor.ala.build.Project;
 
 public class RepositoryVisitor {
 
-    private Project project;
-    private File rootFolder;
-    private File projectFolder;
-    private String buildRoot;
+    private static final Random RND = new Random();
+    private File root;
 
-    public RepositoryVisitor( final Project project ) {
-        this.project = project;
-        this.buildRoot = System.getProperty( "java.io.tmpdir" ) + File.separatorChar + "guvnor" + File.separatorChar + project.getName();
-        Path path = this.project.getPath();
-        makeTempRootDirectory();
-        makeTempDirectory( path );
-        rootFolder = makeTempDirectory( path );
-        projectFolder = new File( rootFolder.getAbsolutePath() );
+    public RepositoryVisitor( final Path projectPath,
+                              final String projectName ) {
+        this( projectPath,
+              System.getProperty( "java.io.tmpdir" ) + File.separatorChar + "guvnor" + RND.nextLong() + File.separatorChar + projectName,
+              false );
+    }
+
+    public RepositoryVisitor( final Path projectPath,
+                              final String _projectRoot,
+                              final boolean recreateTempDir ) {
+        this.root = makeTempRootDirectory( _projectRoot, recreateTempDir );
+
         try {
-            visitPaths( Files.newDirectoryStream( this.project.getPath() ) );
+            visitPaths( root, Files.newDirectoryStream( projectPath ) );
         } catch ( IOException ex ) {
             throw new RuntimeException( ex );
         }
     }
 
-    public File getRootFolder() {
-        return rootFolder;
+    public File getRoot() {
+        return root;
     }
 
-    public File getProjectFolder() {
-        return projectFolder;
-    }
-
-    public File getGuvnorTempFolder() {
-        return new File( System.getProperty( "java.io.tmpdir" ) + File.separatorChar + "guvnor" );
-    }
-
-    public File getTargetFolder() {
-        return new File( buildRoot + File.separatorChar + project.getRootPath().toAbsolutePath()
-                + File.separatorChar + project.getPath().toAbsolutePath().toString() + File.separatorChar + "target" );
-    }
-
-    public void visitPaths( final DirectoryStream<Path> directoryStream ) throws IOException {
+    private void visitPaths( final File parent,
+                             final DirectoryStream<Path> directoryStream ) throws IOException {
         for ( final org.uberfire.java.nio.file.Path path : directoryStream ) {
             if ( Files.isDirectory( path ) ) {
-                makeTempDirectory( path );
-                visitPaths( Files.newDirectoryStream( path ) );
+                final File newParent = makeTempDirectory( parent, path.getFileName().toString() );
+                visitPaths( newParent, Files.newDirectoryStream( path ) );
             } else {
-                makeTempFile( path );
+                makeTempFile( parent, path );
             }
         }
     }
 
-    public File makeTempDirectory( Path path ) {
-        return makeTempDirectory( getFilePath( path ) );
-    }
-
-    public File makeTempDirectory( String filePath ) {
-        File tempDirectory = new File( filePath );
+    private File makeTempDirectory( final File parent,
+                                    final String filePath ) {
+        File tempDirectory = new File( parent, filePath );
+        if ( tempDirectory.exists() ) {
+            return tempDirectory;
+        }
         if ( !tempDirectory.isFile() ) {
             tempDirectory.mkdir();
         }
         return tempDirectory;
     }
 
-    private void makeTempRootDirectory() {
-        File tempDirectory = new File( buildRoot );
-        if(!tempDirectory.exists()){
-            tempDirectory.mkdirs();
+    private File makeTempRootDirectory( final String tempRoot,
+                                        final boolean recreateTempDir ) {
+        final File tempRootDir = new File( tempRoot );
+        if ( tempRootDir.exists() ) {
+            if ( recreateTempDir ) {
+                try {
+                    FileUtils.deleteDirectory( tempRootDir );
+                } catch ( IOException e ) {
+                    e.printStackTrace();
+                }
+            }
+        } else {
+            tempRootDir.mkdirs();
         }
+        return tempRootDir;
     }
 
-    private void makeTempFile( Path path ) throws IOException {
+    private void makeTempFile( final File parent,
+                               final Path path ) throws IOException {
 
         final int BUFFER = 2048;
-        byte data[] = new byte[BUFFER];
+        byte data[] = new byte[ BUFFER ];
 
         FileOutputStream output = null;
         try ( BufferedInputStream origin = new BufferedInputStream( Files.newInputStream( path ), BUFFER ) ) {
-            String filePath = getFilePath( path );
-            File tempFile = new File( filePath );
-            if(!tempFile.exists()){
+            final File tempFile = new File( parent, path.getFileName().toString() );
+            if ( !tempFile.exists() ) {
                 tempFile.createNewFile();
             }
             output = new FileOutputStream( tempFile );
@@ -117,9 +118,5 @@ public class RepositoryVisitor {
                 output.close();
             }
         }
-    }
-
-    private String getFilePath( Path path ) {
-        return buildRoot + path.toUri().getRawPath();
     }
 }

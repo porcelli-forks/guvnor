@@ -54,8 +54,8 @@ public class GWTCodeServerMavenExecConfigExecutor implements BiFunctionConfigExe
     @Override
     public Optional<MavenBuild> apply(final MavenBuild buildConfig,
             final GWTCodeServerMavenExecConfig config) {
-        RepositoryVisitor repositoryVisitor = getRepositoryVisitor(buildConfig.getProject());
-        final File projectFolder = repositoryVisitor.getProjectFolder();
+        
+        final File projectFolder = new File( buildConfig.getProject().getTempDir() );
         final File webappFolder = new File(projectFolder.getAbsolutePath(), "src/main/webapp");
         
         if((!leaser.isCodeServerRunning(buildConfig.getProject().getName()))){
@@ -105,9 +105,7 @@ public class GWTCodeServerMavenExecConfigExecutor implements BiFunctionConfigExe
             final PrintStream err = new PrintStream(baosErr, true);
             final PrintStream oldout = System.out;
             final PrintStream olderr = System.err;
-            new Thread(() -> {
-                executeMaven(pom, out, err, properties, goals.toArray(new String[]{}));
-            }).start();
+            new Thread( () -> executeMaven( pom, out, err, properties, goals.toArray( new String[]{} ) ) ).start();
             bufferedReader = new BufferedReader(new InputStreamReader(new PipedInputStream(baosOut)));
             String line;
 

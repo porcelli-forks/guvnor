@@ -18,10 +18,10 @@ package org.guvnor.ala.registry;
 
 import java.util.List;
 
-import org.uberfire.java.nio.file.Path;
 import org.guvnor.ala.build.Project;
 import org.guvnor.ala.source.Repository;
 import org.guvnor.ala.source.Source;
+import org.uberfire.java.nio.file.Path;
 
 /*
  * Represents the SourceRegistry source, projects & repositories are registered
@@ -35,7 +35,7 @@ public interface SourceRegistry {
      * @see Repository
      */
     void registerRepositorySources( final Path path,
-            final Repository repo );
+                                    final Repository repo );
 
     /*
      * Get the path for a given repository
@@ -78,7 +78,7 @@ public interface SourceRegistry {
      * @see Project
      */
     void registerProject( final Repository repo,
-            final Project project );
+                          final Project project );
 
     /*
      * Get All the registered project for a given repository
@@ -113,7 +113,7 @@ public interface SourceRegistry {
      * @see Project
      */
     void registerSource( final Repository repo,
-            final Source source );
+                         final Source source );
 
     /*
      * Register a Project code from a Source
@@ -123,5 +123,5 @@ public interface SourceRegistry {
      * @see Project
      */
     void registerProject( final Source source,
-            final Project project );
+                          final Project project );
 }
